@@ -18,9 +18,19 @@ export type InPageCommand =
   | { op: "headerCandidate" }
   | { op: "probeHeader"; selector: string }
   | { op: "cards"; limit: number }
+  | { op: "hoverTargets"; cardLimit: number; navLimit: number }
+  | { op: "hoverSnap"; selector: string }
   | { op: "blocks"; maxBlocks: number }
   | { op: "hash"; selector: string }
   | { op: "dismiss" };
+
+export type HoverSnap = {
+  text: string;
+  images: string[];
+  links: Array<{ href: string; label: string }>;
+  box: Box;
+  hash: string;
+};
 
 export type HeaderProbeLive = {
   selector: string;
@@ -46,6 +56,8 @@ export type InPageResult = {
   headerCandidate: { selector: string; tag: string; className: string } | null;
   headerProbe: HeaderProbeLive | null;
   cards: string[];
+  hoverTargets: Array<{ selector: string; kind: "card" | "nav" }>;
+  hoverSnap: HoverSnap | null;
   blocks: CandidateBlock[];
   hash: { hash: string; text: string; box: Box } | null;
   dismissed: string[];
@@ -60,6 +72,8 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
     headerCandidate: null,
     headerProbe: null,
     cards: [],
+    hoverTargets: [],
+    hoverSnap: null,
     blocks: [],
     hash: null,
     dismissed: [],
@@ -389,6 +403,128 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
     return out;
   }
 
+  const isShown = (el: Element): boolean => {
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden" || Number(cs.opacity) < 0.05) return false;
+    const r = el.getBoundingClientRect();
+    return r.width >= 4 && r.height >= 4;
+  }
+
+  const bitsFrom = (root: Element): { text: string; images: string[]; links: Array<{ href: string; label: string }> } => {
+    const images: string[] = [];
+    const links: Array<{ href: string; label: string }> = [];
+    const seenImg = new Set<string>();
+    const seenLink = new Set<string>();
+    const walk = (el: Element) => {
+      if (!isShown(el)) return;
+      if (el instanceof HTMLImageElement) {
+        const src = el.currentSrc || el.src;
+        if (src && !src.startsWith("data:image/svg") && !seenImg.has(src)) {
+          seenImg.add(src);
+          images.push(src);
+        }
+      }
+      if (el instanceof HTMLAnchorElement && el.href) {
+        const label = (el.innerText || el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+        const key = `${el.href}|${label}`;
+        if (label && label.length <= 48 && !seenLink.has(key)) {
+          seenLink.add(key);
+          links.push({ href: el.href, label });
+        }
+      }
+      for (const child of Array.from(el.children)) walk(child);
+    }
+    walk(root);
+    return { text: visibleText(root).slice(0, 600), images, links };
+  }
+
+  const mergeBits = (
+    a: { text: string; images: string[]; links: Array<{ href: string; label: string }> },
+    b: { text: string; images: string[]; links: Array<{ href: string; label: string }> },
+  ) => {
+    const images = [...a.images];
+    for (const img of b.images) if (!images.includes(img)) images.push(img);
+    const links = [...a.links];
+    const seen = new Set(a.links.map((l) => `${l.href}|${l.label}`));
+    for (const l of b.links) {
+      const key = `${l.href}|${l.label}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      links.push(l);
+    }
+    const text = `${a.text} ${b.text}`.replace(/\s+/g, " ").trim().slice(0, 800);
+    return { text, images, links };
+  }
+
+  const popoutBits = (anchor: Element) => {
+    const a = anchor.getBoundingClientRect();
+    const empty = { text: "", images: [] as string[], links: [] as Array<{ href: string; label: string }> };
+    let extra = empty;
+    const nodes = document.querySelectorAll(
+      "header *, [role='menu'], [role='listbox'], [class*='menu' i], [class*='dropdown' i], [class*='mega' i], [class*='popover' i], [class*='flyout' i]",
+    );
+    for (const el of Array.from(nodes)) {
+      if (anchor.contains(el)) continue;
+      const cs = getComputedStyle(el);
+      if (cs.position !== "absolute" && cs.position !== "fixed" && cs.position !== "sticky") continue;
+      if (!isShown(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 40 || r.height < 20) continue;
+      const under =
+        r.top >= a.top - 16 && r.top <= a.bottom + 48 && r.left < a.right + 160 && r.right > a.left - 160;
+      const drop = r.top >= a.bottom - 12 && r.top <= a.bottom + 480 && r.width >= 80;
+      if (!under && !drop) continue;
+      extra = mergeBits(extra, bitsFrom(el));
+    }
+    return extra;
+  }
+
+  const hoverSnap = (selector: string): HoverSnap | null => {
+    const el = document.querySelector(selector);
+    if (!el) return null;
+    const bits = mergeBits(bitsFrom(el), popoutBits(el));
+    const payload = `${bits.text}|${bits.images.join(",")}|${bits.links.map((l) => l.label).join(",")}`;
+    let h = 0;
+    for (let i = 0; i < payload.length; i++) h = (h * 31 + payload.charCodeAt(i)) | 0;
+    return { ...bits, box: boxOf(el), hash: String(h) };
+  }
+
+  const findNavs = (limit: number): string[] => {
+    const header = document.querySelector("header, [role='banner']") ?? document.body;
+    if (!header) return [];
+    const seen = new Set<string>();
+    const out: string[] = [];
+    const nodes = Array.from(header.querySelectorAll("a, button, [aria-haspopup='true']"));
+    for (const el of nodes) {
+      const r = el.getBoundingClientRect();
+      if (r.y > 160 || r.height < 10 || r.height > 64 || r.width < 12) continue;
+      const label = (el.textContent || el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+      if (/^(cart|search|login|log in|account|wishlist)$/i.test(label)) continue;
+      const sel = cssPath(el);
+      if (seen.has(sel)) continue;
+      seen.add(sel);
+      out.push(sel);
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+
+  const findHoverTargets = (cardLimit: number, navLimit: number): Array<{ selector: string; kind: "card" | "nav" }> => {
+    const seen = new Set<string>();
+    const out: Array<{ selector: string; kind: "card" | "nav" }> = [];
+    for (const selector of findCards(cardLimit)) {
+      if (seen.has(selector)) continue;
+      seen.add(selector);
+      out.push({ selector, kind: "card" });
+    }
+    for (const selector of findNavs(navLimit)) {
+      if (seen.has(selector)) continue;
+      seen.add(selector);
+      out.push({ selector, kind: "nav" });
+    }
+    return out;
+  }
+
   const cleanSnippet = (el: Element, max = 6000): string => {
     const clone = el.cloneNode(true) as Element;
     clone.querySelectorAll("script, style, noscript, iframe, svg").forEach((n) => n.remove());
@@ -530,6 +666,10 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
       return { ...empty, headerProbe: probe(cmd.selector) };
     case "cards":
       return { ...empty, cards: findCards(cmd.limit) };
+    case "hoverTargets":
+      return { ...empty, hoverTargets: findHoverTargets(cmd.cardLimit, cmd.navLimit) };
+    case "hoverSnap":
+      return { ...empty, hoverSnap: hoverSnap(cmd.selector) };
     case "blocks":
       return { ...empty, blocks: collectBlocks(cmd.maxBlocks) };
     case "hash":

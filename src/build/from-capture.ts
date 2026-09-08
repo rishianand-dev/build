@@ -68,6 +68,7 @@ const SKIP_TAGS = new Set(["script", "style", "noscript", "iframe", "quick-add-m
 function isJunkRoot(node: DomNode): boolean {
   if (SKIP_TAGS.has(node.tag)) return true;
   if (looksHidden(node) && node.tag !== "img" && node.tag !== "video") return true;
+  if (isModalOverlay(node)) return true;
   if (node.className.includes("skip-to-content")) return true;
   if (node.className.includes("quick-add")) return true;
   if (node.className.includes("omega-chat")) return true;
@@ -76,7 +77,11 @@ function isJunkRoot(node: DomNode): boolean {
 
 function priceFrom(node: DomNode): { sale?: string; regular?: string } {
   const all = texts(node);
-  const prices = all.filter((t) => /(?:rs\.?|₹|\$|€)\s*[\d,]+/i.test(t) && !/regular price|sale price/i.test(t));
+  const prices = all.filter(
+    (t) =>
+      (/(?:rs\.?|inr|usd|gbp|eur|₹|\$|€|£|¥)\s*[\d,]+(?:\.\d+)?/i.test(t) || /^\s*[\d,]+\.\d{2}\s*$/.test(t)) &&
+      !/regular price|sale price/i.test(t),
+  );
   if (prices.length >= 2) return { regular: prices[0], sale: prices[1] };
   if (prices.length === 1) return { sale: prices[0] };
   return {};
@@ -257,7 +262,7 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
   const catStyle = internStyle(theme.styles, { gap: "$space.3", cols: 6, align: "center" });
 
   theme.components.card = {
-    binds: ["img", "title", "price", "was", "badge", "href", "slug", "cta"],
+    binds: ["img", "title", "price", "was", "badge", "href", "slug", "cta", "hoverImg", "hoverLabel"],
     root: {
       type: "link",
       bind: "href",
@@ -269,7 +274,9 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
           role: "media",
           children: [
             { type: "image", bind: "img" },
+            { type: "image", bind: "hoverImg", role: "hover-img" },
             { type: "text", bind: "badge", tag: "span", style: badgeStyle, role: "badge" },
+            { type: "text", bind: "hoverLabel", tag: "span", role: "hover" },
           ],
         },
         {
@@ -338,6 +345,8 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     seenMedia,
     catalog,
     slugs,
+    headerEl,
+    footerEl,
   };
 
   const body: Node[] = [];
@@ -345,8 +354,9 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
   let headerPlaced = false;
   for (const child of root.children) {
     if (isJunkRoot(child)) continue;
-    if (footerEl && (child === footerEl || contains(child, footerEl))) continue;
-    if (headerEl && (child === headerEl || contains(child, headerEl))) {
+    if (isModalOverlay(child)) continue;
+    if (footerEl && child === footerEl) continue;
+    if (headerEl && child === headerEl) {
       headerPlaced = true;
       continue;
     }
@@ -357,7 +367,16 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     body.push(...buildBlock(child, ctx));
   }
   const headerBits = headerEl
-    ? buildHeader(headerEl, theme, headerStyle, headerInnerStyle, logoStyle, promoStyle, catalog.length > 0)
+    ? buildHeader(
+        headerEl,
+        theme,
+        headerStyle,
+        headerInnerStyle,
+        logoStyle,
+        promoStyle,
+        catalog.length > 0,
+        capture.hover_reveals,
+      )
     : [];
   if (!headerEl) review.push({ path: "/pages/0/header", reason: "No header element", confidence: 0.2 });
   const chrome = [...topChrome, ...headerBits];
@@ -376,17 +395,19 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
       },
     },
   ];
-  attachConnectedPages(theme, {
-    header: chrome,
-    footer: footerNode,
-    catalog,
-    pageStyle,
-    sectionStyle,
-    h2Style,
-    gridStyle,
-    priceStyle,
-    wasStyle,
-  });
+  if (catalog.length) {
+    attachConnectedPages(theme, {
+      header: chrome,
+      footer: footerNode,
+      catalog,
+      pageStyle,
+      sectionStyle,
+      h2Style,
+      gridStyle,
+      priceStyle,
+      wasStyle,
+    });
+  }
   theme.review = review;
   return prune(theme) as ThemeDoc;
 }
@@ -404,6 +425,8 @@ interface BuildCtx {
   seenMedia: Set<string>;
   catalog: BindMap[];
   slugs: Set<string>;
+  headerEl?: DomNode;
+  footerEl?: DomNode;
 }
 
 function findHeaderNode(root: DomNode): DomNode | undefined {
@@ -540,7 +563,7 @@ function hasMedia(node: DomNode): boolean {
   );
 }
 
-function repeatingUnits(node: DomNode): DomNode[] {
+function unitsFromKids(node: DomNode): DomNode[] {
   const kids = visibleKids(node).filter(
     (k) => k.box.width >= 90 && k.box.height >= 70 && k.box.width < node.box.width * 0.92,
   );
@@ -548,10 +571,21 @@ function repeatingUnits(node: DomNode): DomNode[] {
   if (withMedia.length >= 2 && withMedia.every((k) => similarBox(k, withMedia[0]!))) {
     return dedupeUnits(withMedia);
   }
-  for (const kid of visibleKids(node)) {
-    if (kid.box.height < 80) continue;
-    const nested = repeatingUnits(kid);
-    if (nested.length >= 2) return nested;
+  return [];
+}
+
+function repeatingUnits(node: DomNode): DomNode[] {
+  let cur = node;
+  for (let depth = 0; depth < 8; depth++) {
+    const units = unitsFromKids(cur);
+    if (units.length >= 2) return units;
+    const shells = visibleKids(cur).filter((k) => k.box.width >= cur.box.width * 0.75 && k.box.height >= 70);
+    if (shells.length !== 1) return [];
+    const shell = shells[0]!;
+    if (cur.box.height >= 640 && shell.box.height >= Math.min(cur.box.height * 0.85, cur.box.height - 40)) {
+      return [];
+    }
+    cur = shell;
   }
   return [];
 }
@@ -629,17 +663,27 @@ function socialLabel(node: DomNode): string {
   return node.ariaLabel || "";
 }
 
+function isModalOverlay(node: DomNode): boolean {
+  const pos = node.style.position;
+  if (pos !== "fixed" && pos !== "absolute") return false;
+  if (node.box.width < 640 || node.box.height < 320) return false;
+  const t = deepText(node).toLowerCase();
+  return /log in|sign in|enter your phone|cookie|accept all|above 18|verify (your )?age/.test(t);
+}
+
 function isWrapper(node: DomNode, kids: DomNode[]): boolean {
   if (isSlider(node)) return false;
   if (node.tag === "main" || node.tag === "body") return true;
   if (/page-wrapper|main-content|layout|page-container|site-wrapper|content-for-layout/.test(nameOf(node))) return true;
   if (node.tag === "section") return false;
-  if (kids.length === 1 && kids[0]!.box.height >= node.box.height * 0.8) return true;
+  if (kids.length === 1 && kids[0]!.box.height >= node.box.height * 0.55) return true;
   const fullWidth = kids.filter((k) => k.box.width >= node.box.width * 0.7 && k.box.height >= 80);
   return fullWidth.length >= 3 && node.box.height > 800;
 }
 
 function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
+  if (node === ctx.headerEl || node === ctx.footerEl) return [];
+  if (isModalOverlay(node)) return [];
   if (node.box.height < 24 && node.tag !== "video") return [];
   const kids = visibleKids(node);
 
@@ -713,8 +757,11 @@ function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
     return [{ type: "stack", style: ctx.sectionStyle, children: section }];
   }
 
-  const mediaTiles = visualTiles(node);
-  const fullBleed = mediaTiles.filter((n) => n.box.width >= Math.max(700, node.box.width * 0.85));
+  const mediaTiles = visualTiles(node).filter((n) => {
+    const key = n.src || n.poster || "";
+    return key && !ctx.seenMedia.has(key);
+  });
+  const fullBleed = mediaTiles.filter((n) => n.box.width >= Math.max(640, node.box.width * 0.8));
   const band = fullBleed.filter((n) => Math.abs(n.box.y - (fullBleed[0]?.box.y ?? n.box.y)) < 80);
   if (band.length >= 2) {
     const slides = band.flatMap((img) => {
@@ -723,26 +770,19 @@ function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
     });
     if (slides.length >= 2) return [{ type: "stack", role: "carousel", children: slides }];
   }
-  if (fullBleed.length >= 1) {
+  if (fullBleed.length >= 1 && mediaTiles.length <= 2) {
     const hero = mediaNode(ctx, fullBleed[0]!, ctx.heroStyle, "hero");
     if (hero) return [hero];
   }
-  if (mediaTiles.length >= 2 && mediaTiles.length <= 8) {
-    const title = sectionTitle(node);
-    const children: Node[] = [];
-    if (title) children.push({ type: "text", text: title, tag: "h2", style: ctx.h2Style });
-    const cols = Math.min(tiles.length, 4);
-    const style = internStyle(ctx.theme.styles, { gap: "$space.2", cols });
-    children.push({
-      type: "grid",
-      style,
-      children: mediaTiles.flatMap((img) => {
-        const n = mediaNode(ctx, img);
-        return n ? [n] : [];
-      }),
-    });
-    if (children.length > (title ? 1 : 0)) return [{ type: "stack", style: ctx.sectionStyle, children }];
+
+  if (kids.length >= 2 && node.box.height > 420) {
+    const nested: Node[] = [];
+    for (const kid of kids) nested.push(...buildBlock(kid, ctx));
+    if (nested.length) return nested;
   }
+
+  const mediaRows = emitMediaRows(node, ctx, mediaTiles);
+  if (mediaRows.length) return mediaRows;
 
   const video = findOne(node, (n) => n.tag === "video" && n.box.width >= 400 && n.box.height >= 180);
   if (video) {
@@ -784,17 +824,22 @@ function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
     return [{ type: "stack", style: ctx.sectionStyle, children }];
   }
 
-  if (title || copy.length) {
-    const children: Node[] = [];
-    if (title) children.push({ type: "text", text: title, tag: "h2", style: ctx.h2Style });
-    for (const t of copy) children.push({ type: "text", text: t, tag: "p" });
-    if (children.length) return [{ type: "stack", style: ctx.sectionStyle, children }];
-  }
-
   if (kids.length) {
     const nested: Node[] = [];
     for (const kid of kids) nested.push(...buildBlock(kid, ctx));
     if (nested.length) return nested;
+  }
+
+  if (title || copy.length) {
+    const children: Node[] = [];
+    if (title) children.push({ type: "text", text: title, tag: "h2", style: ctx.h2Style });
+    for (const t of copy) children.push({ type: "text", text: t, tag: "p" });
+    const leftover = visualTiles(node).flatMap((img) => {
+      const n = mediaNode(ctx, img);
+      return n ? [n] : [];
+    });
+    children.push(...leftover);
+    if (children.length) return [{ type: "stack", style: ctx.sectionStyle, children }];
   }
 
   if (node.box.height >= 360 && node.box.width >= 700) {
@@ -804,13 +849,52 @@ function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
   return [];
 }
 
+function emitMediaRows(node: DomNode, ctx: BuildCtx, tiles: DomNode[]): Node[] {
+  if (!tiles.length) return [];
+  const rows: DomNode[][] = [];
+  for (const img of [...tiles].sort((a, b) => a.box.y - b.box.y || a.box.x - b.box.x)) {
+    const row = rows.find((r) => Math.abs(r[0]!.box.y - img.box.y) < 90);
+    if (row) row.push(img);
+    else rows.push([img]);
+  }
+  const title = sectionTitle(node);
+  const children: Node[] = [];
+  if (title) children.push({ type: "text", text: title, tag: "h2", style: ctx.h2Style });
+  for (const row of rows) {
+    const overflow = row.some((s) => s.box.x + s.box.width > node.box.x + node.box.width + 40);
+    if (row.length >= 2 && overflow) {
+      const slides = row.flatMap((img) => {
+        const n = mediaNode(ctx, img, undefined, undefined, { keep: true });
+        return n ? [n] : [];
+      });
+      if (slides.length >= 2) children.push({ type: "stack", role: "carousel", children: slides });
+      continue;
+    }
+    if (row.length === 1) {
+      const hero = row[0]!.box.width >= Math.max(640, node.box.width * 0.75);
+      const n = mediaNode(ctx, row[0]!, hero ? ctx.heroStyle : undefined, hero ? "hero" : undefined);
+      if (n) children.push(n);
+      continue;
+    }
+    const cols = Math.min(row.length, 6);
+    const style = internStyle(ctx.theme.styles, { gap: "$space.2", cols });
+    const cells = row.flatMap((img) => {
+      const n = mediaNode(ctx, img);
+      return n ? [n] : [];
+    });
+    if (cells.length) children.push({ type: "grid", style, children: cells });
+  }
+  if (!children.length || (title && children.length === 1)) return [];
+  return [{ type: "stack", style: ctx.sectionStyle, children }];
+}
+
 function visualTiles(node: DomNode): DomNode[] {
   const imgs = findAll(
     node,
     (n) =>
       ((n.tag === "img" && Boolean(n.src)) || (n.tag === "video" && Boolean(n.src || n.poster))) &&
-      n.box.width >= 200 &&
-      n.box.height >= 140,
+      n.box.width >= 96 &&
+      n.box.height >= 64,
     isCloned,
   );
   const unique: DomNode[] = [];
@@ -900,7 +984,7 @@ function extractTiles(node: DomNode, ctx: BuildCtx): BindMap[] {
     const img = unitImage(tile);
     if (!img?.src || used.has(img.src)) continue;
     const title = unitTitle(tile, img);
-    if (!title || title.length > 48) continue;
+    if (title.length > 64) continue;
     used.add(img.src);
     const asset = internImg(ctx.theme, img);
     if (!asset) continue;
@@ -951,9 +1035,45 @@ function extractCards(node: DomNode, ctx: BuildCtx): BindMap[] {
       cta,
     };
     ctx.catalog.push(item);
+    applyHoverReveal(item, ctx);
     items.push(item);
   }
   return items;
+}
+
+function applyHoverReveal(item: BindMap, ctx: BuildCtx): void {
+  const title = String(item.title ?? "");
+  if (!title) return;
+  const needle = title.toLowerCase().slice(0, 18);
+  const hit = ctx.capture.hover_reveals.find((h) => {
+    if (h.kind === "nav") return false;
+    if (!h.revealed && !(h.added_text || h.added_images?.length || h.added_links?.length)) return false;
+    return `${h.text_preview} ${h.added_text}`.toLowerCase().includes(needle);
+  });
+  if (!hit) return;
+  const hoverSrc = (hit.added_images ?? []).find((u) => Boolean(u) && !u.startsWith("data:image/svg"));
+  if (hoverSrc) {
+    const abs = hoverSrc.startsWith("//") ? `https:${hoverSrc}` : hoverSrc;
+    const id = internAsset(ctx.theme.assets, abs, { kind: "image" });
+    if (id && id !== item.img) item.hoverImg = id;
+  }
+  const fromLink = (hit.added_links ?? []).find((l) => /quick view|add to|view|shop|options/i.test(l.label))?.label;
+  const label = (hit.added_text || fromLink || "").replace(/\s+/g, " ").trim().slice(0, 48);
+  if (label && label.toLowerCase() !== title.toLowerCase()) item.hoverLabel = label;
+}
+
+function navMenusFromHover(
+  reveals: Array<{ kind?: string; revealed: boolean; text_preview: string; added_links?: Array<{ href: string; label: string }> }>,
+): Map<string, Array<{ href: string; label: string }>> {
+  const menus = new Map<string, Array<{ href: string; label: string }>>();
+  for (const h of reveals) {
+    if (h.kind !== "nav" || !h.revealed) continue;
+    const links = (h.added_links ?? []).filter((l) => l.label && l.label.length <= 42);
+    if (links.length < 2) continue;
+    const key = h.text_preview.replace(/\s+/g, " ").trim().toLowerCase().slice(0, 28);
+    if (key) menus.set(key, links);
+  }
+  return menus;
 }
 
 function sectionTitle(node: DomNode): string {
@@ -980,6 +1100,7 @@ function buildHeader(
   logoStyle: string,
   promoStyle: string,
   includeShop: boolean,
+  reveals: PageCapture["hover_reveals"] = [],
 ): Node[] {
   const rows = visibleKids(header);
   const out: Node[] = [];
@@ -1013,6 +1134,7 @@ function buildHeader(
         children: [{ type: "text", text: shortSiteName(theme.site.name), tag: "h1" }],
       };
 
+  const menus = navMenusFromHover(reveals);
   const links = connectedNavLinks(header, includeShop);
   const tools = headerTools(header);
   const innerKids: Node[] = [
@@ -1020,11 +1142,32 @@ function buildHeader(
     {
       type: "row",
       role: "nav",
-      children: links.map((l) => ({
-        type: "link" as const,
-        href: l.href,
-        children: [{ type: "text" as const, text: l.label, tag: "span" as const }],
-      })),
+      children: links.map((l) => {
+        const menu =
+          menus.get(l.label.toLowerCase()) ??
+          [...menus.entries()].find(([k]) => k.startsWith(l.label.toLowerCase()) || l.label.toLowerCase().startsWith(k.split(/\s+/)[0] ?? k))?.[1] ??
+          [];
+        return {
+          type: "link" as const,
+          href: l.href,
+          children: [
+            { type: "text" as const, text: l.label, tag: "span" as const },
+            ...(menu.length
+              ? [
+                  {
+                    type: "stack" as const,
+                    role: "menu",
+                    children: menu.map((m) => ({
+                      type: "link" as const,
+                      href: internalNavHref(m.href, m.label),
+                      children: [{ type: "text" as const, text: m.label, tag: "span" as const }],
+                    })),
+                  },
+                ]
+              : []),
+          ],
+        };
+      }),
     },
   ];
   if (tools.length) innerKids.push({ type: "row", role: "tools", children: tools });

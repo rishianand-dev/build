@@ -297,6 +297,31 @@ function routeScript(): string {
 </script>`;
 }
 
+function menuScript(): string {
+  return `<script>
+(function () {
+  document.querySelectorAll(".r-nav > .n-link").forEach(function (link) {
+    var menu = link.querySelector(".r-menu");
+    if (!menu) return;
+    link.addEventListener("click", function (e) {
+      if (e.target.closest(".r-menu")) return;
+      e.preventDefault();
+      document.querySelectorAll(".r-nav > .n-link.open").forEach(function (other) {
+        if (other !== link) other.classList.remove("open");
+      });
+      link.classList.toggle("open");
+    });
+  });
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".r-nav > .n-link")) return;
+    document.querySelectorAll(".r-nav > .n-link.open").forEach(function (link) {
+      link.classList.remove("open");
+    });
+  });
+})();
+</script>`;
+}
+
 function carouselScript(): string {
   return `<script>
 (function () {
@@ -563,7 +588,56 @@ ${fontLinks}
     object-fit: contain;
     object-position: center top;
     background: #f3f3f3;
+    transition: opacity 0.25s ease;
   }
+  .r-hover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    z-index: 1;
+  }
+  .r-card:hover .r-hover-img { opacity: 1; }
+  .r-card:hover .r-media > img:not(.r-hover-img) { opacity: 0; }
+  .r-hover {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    padding: 10px 8px;
+    background: color-mix(in srgb, #000 45%, transparent);
+    color: #fff;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .r-card:hover .r-hover { opacity: 1; }
+  .r-nav { position: relative; }
+  .r-nav > .n-link { position: relative; }
+  .r-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 40;
+    min-width: 188px;
+    flex-direction: column;
+    gap: 0;
+    padding: 10px 0;
+    background: #fff;
+    color: var(--fg);
+    box-shadow: 0 10px 28px color-mix(in srgb, #000 14%, transparent);
+  }
+  .r-nav > .n-link:hover > .r-menu,
+  .r-nav > .n-link:focus-within > .r-menu,
+  .r-nav > .n-link.open > .r-menu { display: flex; }
+  .r-menu a { display: block; padding: 8px 16px; white-space: nowrap; }
   .r-badge {
     position: absolute;
     left: 10px;
@@ -627,6 +701,7 @@ ${fontLinks}
 ${body}
 ${router}
 ${carouselScript()}
+${menuScript()}
 </body>
 </html>
 `;

@@ -305,7 +305,7 @@ describe("themeFromCapture", () => {
 
     const theme = themeFromCapture(capture);
     const html = renderThemeHtml(theme);
-    expect(theme.pages.map((p) => p.path)).toEqual(["/", "/shop"]);
+    expect(theme.pages.map((p) => p.path)).toEqual(["/"]);
     expect(html).toContain("<header");
     expect(html).toContain("SHOP");
     expect(html).toContain("https://cdn.example/logo.png");
@@ -313,8 +313,7 @@ describe("themeFromCapture", () => {
     expect(html).toContain("SHOP BY CATEGORY");
     expect(html).toContain("https://cdn.example/a.jpg");
     expect(html).toContain("https://cdn.example/c.jpg");
-    expect(html).toContain('href="#/shop"');
-    expect(html).toContain('data-route="/shop"');
+    expect(html).not.toContain('data-route="/shop"');
     expect(html).not.toMatch(/<img[^>]+logo\.png[^>]*class="n-stack/);
   });
 
@@ -588,6 +587,48 @@ describe("themeFromCapture", () => {
     expect(html).toContain("~ Best sellers ~");
   });
 
+  it("finds priced cards inside a slider track", () => {
+    const theme = themeFromCapture(
+      sample(
+        el({
+          tag: "body",
+          box: { x: 0, y: 0, width: 1440, height: 900 },
+          children: [
+            el({
+              tag: "section",
+              box: { x: 0, y: 80, width: 1440, height: 500 },
+              children: [
+                el({ tag: "h2", text: "Trending" }),
+                el({
+                  tag: "div",
+                  className: "slider",
+                  box: { x: 0, y: 140, width: 1440, height: 400 },
+                  children: [
+                    el({
+                      tag: "div",
+                      className: "track",
+                      box: { x: 0, y: 140, width: 2000, height: 400 },
+                      children: [
+                        productSlide(40, "https://cdn.example/n1.jpg", "Noodle One"),
+                        productSlide(280, "https://cdn.example/n2.jpg", "Noodle Two"),
+                        productSlide(520, "https://cdn.example/n3.jpg", "Noodle Three"),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ),
+    );
+    expect(theme.pages.map((p) => p.path)).toContain("/shop");
+    const html = renderThemeHtml(theme);
+    expect(html).toContain("Noodle One");
+    expect(html).toContain("Noodle Three");
+    expect(html).toMatch(/class="[^"]*r-card/);
+  });
+
   it("renders collection lists as tiles instead of product cards", () => {
     const theme = themeFromCapture(
       sample(
@@ -797,6 +838,375 @@ describe("themeFromCapture", () => {
     expect(html).toContain("$24.00");
     expect(html).toContain("r-card");
     expect(html).not.toContain("Add to cart");
+  });
+
+  it("replays captured hover overlays on cards and nav menus", () => {
+    const capture = sample(
+      el({
+        tag: "body",
+        box: { x: 0, y: 0, width: 1440, height: 800 },
+        children: [
+          el({
+            tag: "header",
+            children: [el({ tag: "a", href: "https://shop.example/shop", text: "Shop" })],
+          }),
+          el({
+            tag: "section",
+            box: { x: 0, y: 80, width: 1440, height: 420 },
+            children: [
+              el({ tag: "h2", text: "New arrivals" }),
+              el({
+                tag: "div",
+                box: { x: 40, y: 140, width: 260, height: 320 },
+                children: [
+                  el({
+                    tag: "img",
+                    src: "https://cdn.example/tee.jpg",
+                    box: { x: 40, y: 140, width: 240, height: 240 },
+                  }),
+                  el({ tag: "h3", text: "Cotton Tee" }),
+                  el({ tag: "span", text: "$24.00" }),
+                ],
+              }),
+              el({
+                tag: "div",
+                box: { x: 320, y: 140, width: 260, height: 320 },
+                children: [
+                  el({
+                    tag: "img",
+                    src: "https://cdn.example/hoodie.jpg",
+                    box: { x: 320, y: 140, width: 240, height: 240 },
+                  }),
+                  el({ tag: "h3", text: "Hoodie" }),
+                  el({ tag: "span", text: "$48.00" }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    );
+    capture.hover_reveals = [
+      {
+        index: 0,
+        selector: ".card",
+        kind: "card",
+        box: { x: 40, y: 140, width: 260, height: 320 },
+        text_preview: "Cotton Tee $24.00",
+        before_html_hash: "1",
+        after_html_hash: "2",
+        revealed: true,
+        added_text: "Quick view",
+        added_images: ["https://cdn.example/tee-alt.jpg"],
+        added_links: [],
+        evidence: ["visible content changed on hover"],
+      },
+      {
+        index: 1,
+        selector: "nav a",
+        kind: "nav",
+        box: { x: 0, y: 0, width: 40, height: 20 },
+        text_preview: "Shop",
+        before_html_hash: "3",
+        after_html_hash: "4",
+        revealed: true,
+        added_text: "Men Women",
+        added_images: [],
+        added_links: [
+          { href: "https://shop.example/men", label: "Men" },
+          { href: "https://shop.example/women", label: "Women" },
+        ],
+        evidence: ["visible content changed on hover"],
+      },
+    ];
+    const html = renderThemeHtml(themeFromCapture(capture));
+    expect(html).toContain("Quick view");
+    expect(html).toContain("https://cdn.example/tee-alt.jpg");
+    expect(html).toContain("r-hover");
+    expect(html).toContain("r-hover-img");
+    expect(html).toContain("r-menu");
+    expect(html).toContain("Men");
+    expect(html).toContain("Women");
+  });
+
+  it("keeps a lone logo image and does not invent a shop page", () => {
+    const theme = themeFromCapture(
+      sample(
+        el({
+          tag: "body",
+          box: { x: 0, y: 0, width: 1440, height: 800 },
+          children: [
+            el({
+              tag: "main",
+              box: { x: 0, y: 0, width: 1440, height: 800 },
+              children: [
+                el({
+                  tag: "img",
+                  src: "https://cdn.example/globe.png",
+                  alt: "Wikipedia",
+                  box: { x: 620, y: 80, width: 200, height: 183 },
+                }),
+                el({ tag: "h1", text: "Wikipedia", box: { x: 0, y: 280, width: 1440, height: 40 } }),
+                el({
+                  tag: "p",
+                  text: "The Free Encyclopedia",
+                  box: { x: 0, y: 330, width: 1440, height: 24 },
+                }),
+              ],
+            }),
+          ],
+        }),
+      ),
+    );
+    const html = renderThemeHtml(theme);
+    expect(theme.pages.map((p) => p.path)).toEqual(["/"]);
+    expect(html).toContain("https://cdn.example/globe.png");
+    expect(html).toContain("Wikipedia");
+    expect(html).not.toContain('data-route="/shop"');
+  });
+
+  it("turns pound-priced repeating units into product cards", () => {
+    const card = (x: number, src: string, title: string, price: string) =>
+      el({
+        tag: "article",
+        box: { x, y: 120, width: 220, height: 320 },
+        children: [
+          el({ tag: "img", src, box: { x, y: 120, width: 200, height: 200 } }),
+          el({ tag: "h3", text: title }),
+          el({ tag: "p", text: price }),
+        ],
+      });
+    const theme = themeFromCapture(
+      sample(
+        el({
+          tag: "body",
+          box: { x: 0, y: 0, width: 1440, height: 900 },
+          children: [
+            el({
+              tag: "section",
+              box: { x: 0, y: 80, width: 1440, height: 420 },
+              children: [
+                el({ tag: "h2", text: "Books" }),
+                card(40, "https://cdn.example/a.jpg", "A Light in the Attic", "£51.77"),
+                card(280, "https://cdn.example/b.jpg", "Tipping the Velvet", "£53.74"),
+                card(520, "https://cdn.example/c.jpg", "Soumission", "£50.10"),
+              ],
+            }),
+          ],
+        }),
+      ),
+    );
+    expect(theme.pages.map((p) => p.path)).toContain("/shop");
+    const html = renderThemeHtml(theme);
+    expect(html).toContain("A Light in the Attic");
+    expect(html).toContain("£51.77");
+    expect(html).toContain("https://cdn.example/a.jpg");
+    expect(html).toMatch(/class="[^"]*r-card/);
+  });
+
+  it("emits leftover images from a nested wrapper instead of text-only", () => {
+    const images = Array.from({ length: 9 }, (_, i) =>
+      el({
+        tag: "img",
+        src: `https://cdn.example/deal-${i}.jpg`,
+        box: { x: 40 + (i % 3) * 400, y: 140 + Math.floor(i / 3) * 280, width: 360, height: 240 },
+      }),
+    );
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 2000 },
+            children: [
+              el({
+                tag: "div",
+                className: "layout",
+                box: { x: 0, y: 0, width: 1440, height: 2000 },
+                children: [
+                  el({
+                    tag: "div",
+                    className: "page-container",
+                    box: { x: 0, y: 0, width: 1440, height: 1900 },
+                    children: [
+                      el({
+                        tag: "h1",
+                        text: "Deals of the day",
+                        box: { x: 20, y: 20, width: 400, height: 40 },
+                      }),
+                      el({
+                        tag: "p",
+                        text: "Shop electronics and more from our marketplace.",
+                        box: { x: 20, y: 70, width: 600, height: 30 },
+                      }),
+                      ...images,
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("https://cdn.example/deal-0.jpg");
+    expect(html).toContain("https://cdn.example/deal-8.jpg");
+  });
+
+  it("skips a login overlay and still rebuilds page images", () => {
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 900 },
+            children: [
+              el({
+                tag: "div",
+                style: {
+                  display: "block",
+                  position: "fixed",
+                  top: "0",
+                  left: "0",
+                  right: "0",
+                  bottom: "0",
+                  zIndex: "50",
+                  overflow: "visible",
+                  opacity: "1",
+                  visibility: "visible",
+                  transform: "none",
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  backgroundImage: "none",
+                  color: "rgb(0,0,0)",
+                  fontFamily: "Georgia",
+                  fontSize: "16px",
+                  fontWeight: "400",
+                  lineHeight: "1.4",
+                  textAlign: "left",
+                  padding: "0",
+                  margin: "0",
+                  borderRadius: "0",
+                  boxShadow: "none",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "stretch",
+                  gap: "0",
+                  gridTemplateColumns: "none",
+                },
+                box: { x: 0, y: 0, width: 1440, height: 900 },
+                children: [
+                  el({ tag: "h2", text: "Log in" }),
+                  el({ tag: "p", text: "Enter your phone number to continue" }),
+                ],
+              }),
+              el({
+                tag: "main",
+                box: { x: 0, y: 0, width: 1440, height: 900 },
+                children: [
+                  el({
+                    tag: "img",
+                    src: "https://cdn.example/banner.jpg",
+                    box: { x: 0, y: 0, width: 1440, height: 420 },
+                  }),
+                  el({ tag: "h1", text: "Home appliances", box: { x: 20, y: 440, width: 400, height: 40 } }),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("https://cdn.example/banner.jpg");
+    expect(html).toContain("Home appliances");
+    expect(html).not.toContain("Enter your phone number");
+  });
+
+  it("rebuilds body images when the header is nested inside a page shell", () => {
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 900 },
+            children: [
+              el({
+                tag: "div",
+                id: "container",
+                box: { x: 0, y: 0, width: 1440, height: 900 },
+                children: [
+                  el({
+                    tag: "header",
+                    box: { x: 0, y: 0, width: 1440, height: 64 },
+                    children: [el({ tag: "span", text: "Store" })],
+                  }),
+                  el({
+                    tag: "main",
+                    box: { x: 0, y: 64, width: 1440, height: 800 },
+                    children: [
+                      el({
+                        tag: "img",
+                        src: "https://cdn.example/banner.jpg",
+                        box: { x: 0, y: 64, width: 1440, height: 400 },
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("https://cdn.example/banner.jpg");
+    expect(html).toContain("<header");
+  });
+
+  it("keeps later image bands after an earlier repeating row", () => {
+    const row = (y: number, prefix: string) =>
+      [0, 1, 2].map((i) =>
+        el({
+          tag: "div",
+          box: { x: 40 + i * 400, y, width: 360, height: 220 },
+          children: [
+            el({
+              tag: "img",
+              src: `https://cdn.example/${prefix}-${i}.jpg`,
+              box: { x: 40 + i * 400, y, width: 360, height: 220 },
+            }),
+          ],
+        }),
+      );
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 1200 },
+            children: [
+              el({
+                tag: "div",
+                className: "page-wrapper",
+                box: { x: 0, y: 0, width: 1440, height: 1200 },
+                children: [
+                  el({
+                    tag: "section",
+                    box: { x: 0, y: 0, width: 1440, height: 300 },
+                    children: row(40, "hero"),
+                  }),
+                  el({
+                    tag: "section",
+                    box: { x: 0, y: 400, width: 1440, height: 300 },
+                    children: row(420, "deal"),
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("https://cdn.example/hero-0.jpg");
+    expect(html).toContain("https://cdn.example/deal-2.jpg");
   });
 });
 

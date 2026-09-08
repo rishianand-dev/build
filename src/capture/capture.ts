@@ -200,47 +200,91 @@ export async function capturePage(options: CaptureOptions): Promise<PageCapture>
 
     const header_behavior = inferHeaderBehavior(headerProbe, scrollPx);
 
-    progress({ step: "hover", detail: "Hovering repeated cards" });
-    const cardSelectors = (await page.evaluate(runInPage, { op: "cards" as const, limit: hoverCount }))
-      .cards;
+    progress({ step: "hover", detail: "Hovering cards and nav menus" });
+    const hoverTargets = (
+      await page.evaluate(runInPage, {
+        op: "hoverTargets" as const,
+        cardLimit: hoverCount,
+        navLimit: 5,
+      })
+    ).hoverTargets;
     const hover_reveals: HoverReveal[] = [];
     const hoverShots: ScreenshotPaths["hovers"] = [];
 
-    for (let i = 0; i < cardSelectors.length; i++) {
-      const selector = cardSelectors[i]!;
+    const snap = async (selector: string) =>
+      (await page.evaluate(runInPage, { op: "hoverSnap" as const, selector })).hoverSnap;
+
+    const clickIfSafe = async (selector: string): Promise<boolean> => {
+      return page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (!(el instanceof HTMLElement)) return false;
+        const href = el instanceof HTMLAnchorElement ? el.getAttribute("href") || "" : "";
+        const popup = el.getAttribute("aria-haspopup");
+        if (el.tagName === "BUTTON" || popup === "true" || popup === "menu" || href === "#" || href.startsWith("javascript")) {
+          el.click();
+          return true;
+        }
+        return false;
+      }, selector);
+    };
+
+    for (let i = 0; i < hoverTargets.length; i++) {
+      const target = hoverTargets[i]!;
+      const selector = target.selector;
       await page.evaluate(() => window.scrollTo(0, 0));
       const loc = page.locator(selector).first();
       try {
         await loc.scrollIntoViewIfNeeded({ timeout: 5_000 });
         await page.waitForTimeout(200);
-        const beforeState = (await page.evaluate(runInPage, { op: "hash" as const, selector })).hash;
+        const beforeState = await snap(selector);
         const beforePath = join(shotDir, `hover-${i}-before.png`);
         await screenshot(page, beforePath);
         await loc.hover({ timeout: 5_000 });
         await page.waitForTimeout(450);
-        const afterState = (await page.evaluate(runInPage, { op: "hash" as const, selector })).hash;
-        const afterPath = join(shotDir, `hover-${i}-after.png`);
-        await screenshot(page, afterPath);
+        let afterState = await snap(selector);
+        let via = "hover";
+        const changed = Boolean(beforeState && afterState && beforeState.hash !== afterState.hash);
+        if (!changed) {
+          const clicked = await clickIfSafe(selector);
+          if (clicked) {
+            await page.waitForTimeout(400);
+            afterState = await snap(selector);
+            via = "click";
+          }
+        }
 
-        const revealed = Boolean(
-          beforeState && afterState && beforeState.hash !== afterState.hash,
-        );
+        const beforeImgs = new Set(beforeState?.images ?? []);
+        const beforeLinks = new Set((beforeState?.links ?? []).map((l) => `${l.href}|${l.label}`));
+        const added_images = (afterState?.images ?? []).filter((u) => !beforeImgs.has(u));
+        const added_links = (afterState?.links ?? []).filter((l) => !beforeLinks.has(`${l.href}|${l.label}`));
         const added_text =
           beforeState && afterState && afterState.text !== beforeState.text
             ? afterState.text.replace(beforeState.text, "").trim()
             : "";
+        const revealed = Boolean(
+          (beforeState && afterState && beforeState.hash !== afterState.hash) ||
+            added_images.length ||
+            added_links.length ||
+            added_text,
+        );
+
+        const afterPath = join(shotDir, `hover-${i}-after.png`);
+        await screenshot(page, afterPath);
 
         hover_reveals.push({
           index: i,
           selector,
+          kind: target.kind,
           box: afterState?.box ?? beforeState?.box ?? { x: 0, y: 0, width: 0, height: 0 },
           text_preview: (beforeState?.text ?? "").slice(0, 200),
           before_html_hash: beforeState?.hash ?? "",
           after_html_hash: afterState?.hash ?? "",
           revealed,
           added_text: added_text.slice(0, 300),
+          added_images: added_images.slice(0, 6),
+          added_links: added_links.slice(0, 12),
           evidence: revealed
-            ? ["visible content changed on hover"]
+            ? [`visible content changed on ${via}`]
             : ["no visible content change on hover"],
         });
         hoverShots.push({
@@ -249,6 +293,10 @@ export async function capturePage(options: CaptureOptions): Promise<PageCapture>
           before: rel(beforePath),
           after: rel(afterPath),
         });
+
+        await page.mouse.move(0, 0);
+        await page.keyboard.press("Escape").catch(() => undefined);
+        await page.waitForTimeout(150);
       } catch (err) {
         warnings.push(
           `Hover ${i} (${selector}) failed: ${err instanceof Error ? err.message : String(err)}`,

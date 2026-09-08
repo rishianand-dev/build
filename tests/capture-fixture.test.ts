@@ -24,6 +24,8 @@ describe("capturePage fixture", () => {
       expect(capture.header_behavior.always_fixed_on_scroll).toBe(true);
       expect(capture.hover_reveals.length).toBeGreaterThan(0);
       expect(capture.hover_reveals.some((h) => h.revealed)).toBe(true);
+      expect(capture.hover_reveals.some((h) => /quick view/i.test(h.added_text))).toBe(true);
+      expect(capture.hover_reveals.some((h) => h.kind === "nav" && h.added_links.length >= 2)).toBe(true);
 
       const raw = await readFile(join(outDir, "capture.json"), "utf8");
       const parsed = JSON.parse(raw) as { schema_version: string };

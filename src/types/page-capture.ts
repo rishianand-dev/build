@@ -113,15 +113,23 @@ export interface HeaderBehavior {
   probe: HeaderProbe | null;
 }
 
+export interface HoverLink {
+  href: string;
+  label: string;
+}
+
 export interface HoverReveal {
   index: number;
   selector: string;
+  kind: "card" | "nav";
   box: Box;
   text_preview: string;
   before_html_hash: string;
   after_html_hash: string;
   revealed: boolean;
   added_text: string;
+  added_images: string[];
+  added_links: HoverLink[];
   evidence: string[];
 }
 

@@ -21,6 +21,11 @@
       }
       .logo { font-weight: 700; }
       nav a { margin-left: 16px; text-decoration: none; color: #111; }
+      .has-menu { display: inline-block; position: relative; margin-left: 16px; }
+      .has-menu > a { margin-left: 0; }
+      .menu { display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ddd; min-width: 120px; padding: 8px 0; }
+      .has-menu:hover .menu { display: block; }
+      .menu a { display: block; margin: 0; padding: 6px 12px; }
       .hero img { width: 100%; height: 280px; object-fit: cover; display: block; background: #ccc; }
       .cards { display: flex; gap: 16px; padding: 32px; }
       .card {
@@ -39,6 +44,13 @@
     <header>
       <div class="logo">Fixture Store</div>
       <nav>
+        <div class="has-menu">
+          <a href="/shop">Shop</a>
+          <div class="menu">
+            <a href="/men">Men</a>
+            <a href="/women">Women</a>
+          </div>
+        </div>
         <a href="/search">Search</a>
         <a href="/login">Login</a>
         <a href="/cart">Cart</a>
