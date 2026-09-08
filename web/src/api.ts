@@ -81,6 +81,31 @@ export interface AuthUser {
   name: string | null;
 }
 
+export interface ReviewItem {
+  path: string;
+  reason: string;
+  confidence?: number;
+}
+
+/** A loose view of a theme Node — only the fields the review UI reads/edits, not the full typed union. */
+export interface ThemeNodeView {
+  type: string;
+  role?: string;
+  text?: string;
+  children?: ThemeNodeView[];
+  [key: string]: unknown;
+}
+
+export interface ThemeView {
+  pages: Array<{ id: string; path: string; name?: string; title?: string; root: ThemeNodeView }>;
+  review: ReviewItem[];
+}
+
+export type ReviewActionBody =
+  | { path: string; action: "accept" }
+  | { path: string; action: "reject" }
+  | { path: string; action: "edit"; role?: string; text?: string };
+
 const credentials: RequestInit = { credentials: "include" };
 
 async function json<T>(resPromise: Promise<Response>): Promise<T> {
@@ -123,10 +148,16 @@ export const api = {
     ),
   captures: () => json<CaptureSummary[]>(fetch("/api/captures", credentials)),
   capture: (id: string) => json<PageCaptureView>(fetch(`/api/captures/${id}`, credentials)),
-  theme: (id: string) =>
-    json<{
-      pages: Array<{ id: string; path: string; name?: string; title?: string }>;
-    }>(fetch(`/api/captures/${id}/theme`, credentials)),
+  theme: (id: string) => json<ThemeView>(fetch(`/api/captures/${id}/theme`, credentials)),
+  reviewAction: (id: string, body: ReviewActionBody) =>
+    json<ThemeView>(
+      fetch(`/api/captures/${id}/theme/node`, {
+        ...credentials,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }),
+    ),
   deleteCapture: (id: string) =>
     json<{ ok: boolean }>(fetch(`/api/captures/${id}`, { ...credentials, method: "DELETE" })),
   startJob: (url: string) =>

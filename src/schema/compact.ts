@@ -21,6 +21,19 @@ const TOKEN_GROUPS: TokenGroup[] = [
   "shadow",
 ];
 
+/**
+ * Keys whose value must stay a `{}` rather than being dropped when empty,
+ * even though prune()'s general job is stripping empty objects to save
+ * bytes. These are ThemeDoc's non-optional top-level dictionaries (plus
+ * `tokens`' own subgroups) — code throughout the codebase (render-html.ts,
+ * rehost-assets.ts, impact.ts, ...) reads `theme.assets[id]` /
+ * `theme.tokens.color.bg` / etc. assuming the type's guarantee that these
+ * are always present objects, never `undefined`. A builder that happens
+ * to intern zero of something (e.g. a Figma import with no explicit font)
+ * must not silently break that guarantee for everyone downstream.
+ */
+const ALWAYS_KEEP_EMPTY = new Set<string>(["site", "tokens", "styles", "assets", "components", ...TOKEN_GROUPS]);
+
 export function prune(value: unknown): unknown {
   if (value === undefined || value === null) return undefined;
   if (Array.isArray(value)) {
@@ -36,7 +49,7 @@ export function prune(value: unknown): unknown {
         !Array.isArray(next) &&
         next !== null &&
         Object.keys(next).length === 0 &&
-        key !== "site"
+        !ALWAYS_KEEP_EMPTY.has(key)
       ) {
         continue;
       }
@@ -175,6 +188,24 @@ export function resolveNodeAtPath(theme: ThemeDoc, path: string): Node | undefin
     cursor = cursor.children[Number(segs[i + 1])];
   }
   return cursor;
+}
+
+/**
+ * Removes the node at `path` from its parent's `children` array. Only
+ * works on a path that ends in `/children/<i>` (i.e. the node has a
+ * parent to remove it from) — a page or component root itself can't be
+ * deleted this way. Returns false without mutating anything if the path
+ * doesn't resolve.
+ */
+export function deleteNodeAtPath(theme: ThemeDoc, path: string): boolean {
+  const segs = path.split("/").filter(Boolean);
+  if (segs.length < 2 || segs[segs.length - 2] !== "children") return false;
+  const index = Number(segs[segs.length - 1]);
+  const parentPath = `/${segs.slice(0, -2).join("/")}`;
+  const parent = resolveNodeAtPath(theme, parentPath);
+  if (!parent || !("children" in parent) || index < 0 || index >= parent.children.length) return false;
+  parent.children.splice(index, 1);
+  return true;
 }
 
 function nodeWeight(node: Node): number {

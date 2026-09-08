@@ -23,3 +23,10 @@ export function sessionSecret(): string {
   }
   return secret;
 }
+
+/** Figma personal access token, for the Figma import path. Optional — that
+ * path is opt-in, so this returns undefined rather than throwing; callers
+ * that need it (the Figma job route) surface a clear error themselves. */
+export function figmaToken(): string | undefined {
+  return readEnv("FIGMA_TOKEN");
+}

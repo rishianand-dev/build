@@ -7,7 +7,9 @@ import {
   type CaptureSummary,
   type Job,
   type PageCaptureView,
+  type ThemeView,
 } from "./api";
+import { ReviewPanel } from "./Review";
 
 const STEPS = [
   "queued",
@@ -96,10 +98,11 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
   const [list, setList] = useState<CaptureSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [capture, setCapture] = useState<PageCaptureView | null>(null);
+  const [theme, setTheme] = useState<ThemeView | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shot, setShot] = useState<ShotKey>("viewport_top");
-  const [view, setView] = useState<"site" | "source">("site");
+  const [view, setView] = useState<"site" | "source" | "review">("site");
   const [sitePath, setSitePath] = useState("/");
   const [navPages, setNavPages] = useState<Array<{ id: string; path: string; name: string }>>([]);
   const [loadingList, setLoadingList] = useState(true);
@@ -141,20 +144,22 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
   useEffect(() => {
     if (!selectedId) {
       setCapture(null);
+      setTheme(null);
       setNavPages([]);
       setSitePath("/");
       return;
     }
     let cancelled = false;
     void Promise.all([api.capture(selectedId), api.theme(selectedId).catch(() => null)])
-      .then(([data, theme]) => {
+      .then(([data, fetchedTheme]) => {
         if (cancelled) return;
         setCapture(data);
+        setTheme(fetchedTheme);
         setShot("viewport_top");
         setView("site");
         setSitePath("/");
         setUrl(data.url);
-        const pages = (theme?.pages ?? [])
+        const pages = (fetchedTheme?.pages ?? [])
           .filter((page) => page.path === "/" || page.path === "/shop")
           .map((page) => ({
             id: page.id,
@@ -358,6 +363,13 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
                 >
                   Source snapshot
                 </button>
+                <button
+                  type="button"
+                  className={view === "review" ? "active" : ""}
+                  onClick={() => setView("review")}
+                >
+                  Review{theme?.review.length ? ` (${theme.review.length})` : ""}
+                </button>
                 {view === "site"
                   ? navPages.map((page) => (
                       <button
@@ -409,7 +421,8 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
                   src={`/api/captures/${selectedId}/site#${sitePath}`}
                   key={`${selectedId}:${sitePath}`}
                 />
-              ) : (
+              ) : null}
+              {view === "source" ? (
                 <div className="frame">
                   {shotSrc && "single" in shotSrc ? (
                     <img src={shotSrc.single} alt={`${capture.title} ${shot}`} />
@@ -427,7 +440,16 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
                     </div>
                   ) : null}
                 </div>
-              )}
+              ) : null}
+              {view === "review" ? (
+                theme && selectedId ? (
+                  <div className="review-frame">
+                    <ReviewPanel captureId={selectedId} theme={theme} onThemeUpdated={setTheme} />
+                  </div>
+                ) : (
+                  <p className="muted">Loading…</p>
+                )
+              ) : null}
             </>
           )}
         </main>

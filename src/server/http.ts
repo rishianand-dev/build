@@ -13,7 +13,8 @@ import {
 } from "./captures.js";
 import { clearSessionCookie, readCookie, setSessionCookie } from "./cookies.js";
 import { migrate } from "./db.js";
-import { getJob, parseHttpUrl, startJob, type Job } from "./jobs.js";
+import { getJob, parseFigmaInput, parseHttpUrl, startFigmaJob, startJob, type Job } from "./jobs.js";
+import { applyReviewAction, type ReviewAction } from "./review.js";
 
 const MIME: Record<string, string> = {
   ".png": "image/png",
@@ -169,6 +170,24 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
       return true;
     }
 
+    const themeNodeMatch = path.match(/^\/api\/captures\/([^/]+)\/theme\/node$/);
+    if (method === "PATCH" && themeNodeMatch) {
+      const body = await readJson(req);
+      const nodePath = str(body.path);
+      const action = str(body.action);
+      if (!nodePath) throw new HttpError(400, "path is required");
+      if (action !== "accept" && action !== "reject" && action !== "edit") {
+        throw new HttpError(400, "action must be accept, reject, or edit");
+      }
+      const reviewAction: ReviewAction =
+        action === "edit"
+          ? { path: nodePath, action, role: str(body.role), text: str(body.text) }
+          : { path: nodePath, action };
+      const theme = await applyReviewAction(themeNodeMatch[1]!, user.id, reviewAction);
+      send(res, 200, theme);
+      return true;
+    }
+
     const captureMatch = path.match(/^\/api\/captures\/([^/]+)$/);
     if (method === "DELETE" && captureMatch) {
       await deleteCapture(captureMatch[1]!, user.id);
@@ -212,6 +231,18 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
           ? { width: Number(body.width), height: Number(body.height) }
           : undefined;
       send(res, 202, publicJob(startJob(target, user.id, viewport)));
+      return true;
+    }
+
+    // Separate route rather than overloading POST /api/jobs: the input
+    // shape (a Figma file key + node id, not a URL to fetch live) is
+    // different enough to warrant its own request contract.
+    if (method === "POST" && path === "/api/jobs/figma") {
+      const body = await readJson(req);
+      const fileKey = str(body.fileKey);
+      const nodeId = str(body.nodeId);
+      const target = fileKey && nodeId ? { fileKey, nodeId } : parseFigmaInput(str(body.url) ?? "");
+      send(res, 202, publicJob(startFigmaJob(target.fileKey, target.nodeId, user.id)));
       return true;
     }
 

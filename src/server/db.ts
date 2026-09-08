@@ -69,5 +69,27 @@ export async function migrate(): Promise<void> {
   `);
   await db.query(`CREATE INDEX IF NOT EXISTS themes_user_id_idx ON themes(user_id)`);
   await db.query(`CREATE INDEX IF NOT EXISTS themes_user_captured_at_idx ON themes(user_id, captured_at DESC)`);
+  // Every accept/edit/reject a human makes on a heuristic/vision/Figma-derived
+  // node is one labeled training example (predicted vs. corrected) — the data
+  // source for a future trained classifier. See src/server/corrections.ts.
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS corrections (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      capture_id text NOT NULL,
+      node_path text NOT NULL,
+      detector text,
+      predicted_role text,
+      predicted_confidence real,
+      predicted_snapshot jsonb NOT NULL,
+      action text NOT NULL CHECK (action IN ('accept', 'edit', 'reject')),
+      corrected_snapshot jsonb,
+      reason text,
+      created_at timestamptz NOT NULL DEFAULT now()
+    )
+  `);
+  await db.query(`CREATE INDEX IF NOT EXISTS corrections_user_id_idx ON corrections(user_id)`);
+  await db.query(`CREATE INDEX IF NOT EXISTS corrections_capture_id_idx ON corrections(capture_id)`);
+  await db.query(`CREATE INDEX IF NOT EXISTS corrections_detector_idx ON corrections(detector)`);
   migrated = true;
 }

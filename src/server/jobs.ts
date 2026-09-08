@@ -1,6 +1,7 @@
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import { capturePage, defaultCaptureDir } from "../capture/capture.js";
 import { CAPTURES_ROOT } from "./captures.js";
+import { figmaToken } from "./env.js";
 import { saveUserTheme } from "./themes.js";
 
 export interface Job {
@@ -88,6 +89,94 @@ async function runJob(job: Job, viewport?: { width: number; height: number }): P
     job.error = err instanceof Error ? err.message : String(err);
     job.finished_at = new Date().toISOString();
   }
+}
+
+export function startFigmaJob(fileKey: string, nodeId: string, userId: string): Job {
+  const id = `job-${Date.now().toString(36)}-${++n}`;
+  const job: Job = {
+    id,
+    url: `https://www.figma.com/design/${fileKey}?node-id=${nodeId}`,
+    userId,
+    status: "queued",
+    step: "queued",
+    started_at: new Date().toISOString(),
+  };
+  jobs.set(id, job);
+
+  // Shares the same serialized queue as URL-capture jobs: a Figma import
+  // (API calls + downloads) is lighter than a Playwright capture, but
+  // running both kinds unbounded-concurrently isn't worth the complexity
+  // this MVP needs — same conservative choice runJob already makes.
+  queue = queue.then(
+    () => runFigmaJob(job, fileKey, nodeId),
+    () => runFigmaJob(job, fileKey, nodeId),
+  );
+  return job;
+}
+
+async function runFigmaJob(job: Job, fileKey: string, nodeId: string): Promise<void> {
+  job.status = "running";
+  job.step = "fetch";
+  job.detail = "Fetching Figma frame";
+  try {
+    const token = figmaToken();
+    if (!token) throw new Error("FIGMA_TOKEN is not set");
+    const dirName = `figma-${fileKey}-${nodeId.replace(/:/g, "-")}-${Date.now().toString(36)}`;
+    const outDir = join(CAPTURES_ROOT, dirName);
+
+    job.step = "build";
+    job.detail = "Assembling website";
+    const { persistBuildFromFigma } = await import("../build/persist.js");
+    const { theme, capture } = await persistBuildFromFigma(outDir, { fileKey, nodeId, token });
+
+    const captureId = basename(outDir);
+    await saveUserTheme({
+      userId: job.userId,
+      captureId,
+      url: capture.url,
+      finalUrl: capture.final_url,
+      title: capture.title,
+      theme,
+      blocks: capture.candidate_blocks.length,
+      assets: capture.assets.length,
+      warnings: capture.warnings.length,
+      capturedAt: capture.captured_at,
+    });
+    job.status = "done";
+    job.step = "done";
+    job.captureId = captureId;
+    job.detail = capture.title;
+    job.finished_at = new Date().toISOString();
+  } catch (err) {
+    job.status = "error";
+    job.step = "error";
+    job.error = err instanceof Error ? err.message : String(err);
+    job.finished_at = new Date().toISOString();
+  }
+}
+
+/** Accepts a pasted Figma frame URL (`.../design/<fileKey>/...?node-id=<id>` or the
+ * older `/file/` path) or a `fileKey:nodeId` shorthand. Figma's URLs spell node ids
+ * with a dash (`1-234`); the API itself wants a colon (`1:234`). */
+export function parseFigmaInput(input: string): { fileKey: string; nodeId: string } {
+  const trimmed = input.trim();
+  if (!trimmed) throw new Error("A Figma file/frame URL or 'fileKey:nodeId' is required");
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    const url = new URL(trimmed);
+    const fileKey = url.pathname.match(/\/(?:design|file)\/([^/]+)/)?.[1];
+    const nodeIdRaw = url.searchParams.get("node-id");
+    if (!fileKey || !nodeIdRaw) {
+      throw new Error("Figma URL must be a /design/ or /file/ link with a node-id query param");
+    }
+    return { fileKey, nodeId: nodeIdRaw.replace(/-/g, ":") };
+  }
+
+  const idx = trimmed.indexOf(":");
+  if (idx <= 0 || idx === trimmed.length - 1) {
+    throw new Error("Provide a Figma frame URL (with node-id) or 'fileKey:nodeId'");
+  }
+  return { fileKey: trimmed.slice(0, idx), nodeId: trimmed.slice(idx + 1) };
 }
 
 export function parseHttpUrl(input: string): string {
