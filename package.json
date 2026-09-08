@@ -1,0 +1,40 @@
+{
+  "name": "honebi-build",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-assisted website builder: URL capture → compact theme draft",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "NODE_OPTIONS='--dns-result-order=ipv4first --no-network-family-autoselection' vite --config web/vite.config.ts",
+    "build:web": "vite build --config web/vite.config.ts",
+    "preview": "vite preview --config web/vite.config.ts",
+    "capture": "tsx src/cli.ts capture",
+    "playwright:install": "playwright install chromium",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web/tsconfig.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "pg": "^8.23.0",
+    "playwright": "^1.55.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.3.5",
+    "vitest": "^3.0.8"
+  }
+}

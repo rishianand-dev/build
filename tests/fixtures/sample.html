@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture Store</title>
+    <meta name="description" content="Golden-set capture fixture" />
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Georgia, serif; color: #111; background: #fafafa; }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        height: 64px;
+      }
+      .logo { font-weight: 700; }
+      nav a { margin-left: 16px; text-decoration: none; color: #111; }
+      .hero img { width: 100%; height: 280px; object-fit: cover; display: block; background: #ccc; }
+      .cards { display: flex; gap: 16px; padding: 32px; }
+      .card {
+        flex: 1;
+        background: #fff;
+        border: 1px solid #eee;
+        padding: 16px;
+        min-height: 180px;
+      }
+      .card:hover .extra { display: block; }
+      .extra { display: none; color: #c00; }
+      footer { padding: 40px 24px; background: #222; color: #fff; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Fixture Store</div>
+      <nav>
+        <a href="/search">Search</a>
+        <a href="/login">Login</a>
+        <a href="/cart">Cart</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Hero slide" />
+    </section>
+    <section class="cards">
+      <article class="card">
+        <h3>Product A</h3>
+        <p>Cotton tee</p>
+        <div class="extra">Quick view A</div>
+      </article>
+      <article class="card">
+        <h3>Product B</h3>
+        <p>Linen shirt</p>
+        <div class="extra">Quick view B</div>
+      </article>
+      <article class="card">
+        <h3>Product C</h3>
+        <p>Wool coat</p>
+        <div class="extra">Quick view C</div>
+      </article>
+    </section>
+    <div style="height: 1200px"></div>
+    <footer>© Fixture Store</footer>
+  </body>
+</html>

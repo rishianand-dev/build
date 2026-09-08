@@ -1,0 +1,2815 @@
+[
+  {
+    "capability": [
+      "get_appointment_availability"
+    ],
+    "suggested_section_types": [],
+    "service": "AppointmentService",
+    "function": "getAppointmentDates",
+    "method": "POST",
+    "path": "/appointment-slots/available-range",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "business_unit_id",
+      "end_date",
+      "entity_id",
+      "start_date"
+    ],
+    "params_signature": "(     start_date: string,     end_date: string,     entity_id: string,     business_unit_id: string,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_appointment_availability"
+    ],
+    "suggested_section_types": [],
+    "service": "AppointmentService",
+    "function": "getAppointmentSlots",
+    "method": "POST",
+    "path": "/appointment-slots/available",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "business_unit_id",
+      "date",
+      "entity_id"
+    ],
+    "params_signature": "(     date: string,     entity_id: string,     business_unit_id: string,     location_type: string,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_appointment"
+    ],
+    "suggested_section_types": [],
+    "service": "AppointmentService",
+    "function": "createAppointment",
+    "method": "POST",
+    "path": "/appointments/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqestBody: any, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "AppointmentService",
+    "function": "getProviderConfigurations",
+    "method": "POST",
+    "path": "/provider-configurations/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "active_flag"
+    ],
+    "params_signature": "(provider_type: string, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_appointment"
+    ],
+    "suggested_section_types": [],
+    "service": "AppointmentService",
+    "function": "createJoiningLink",
+    "method": "POST",
+    "path": "/appointments/generate-meeting-link",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqestBody: any, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_business_settings"
+    ],
+    "suggested_section_types": [],
+    "service": "BusinessSettingService",
+    "function": "getBusinessSettings",
+    "method": "POST",
+    "path": "/business-units/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "domain_url"
+    ],
+    "params_signature": "({ token }: { token: string })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_business_settings"
+    ],
+    "suggested_section_types": [],
+    "service": "BusinessSettingService",
+    "function": "getDirectBusinessSettings",
+    "method": "POST",
+    "path": "/direct/business-units/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "domain_url"
+    ],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "BusinessSettingService",
+    "function": "getBusinessPages",
+    "method": "POST",
+    "path": "/business-pages/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "active_flag",
+      "business_unit_id",
+      "page_type"
+    ],
+    "params_signature": "(business_unit_id: string, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cms_content"
+    ],
+    "suggested_section_types": [
+      "Collapsible",
+      "Feature",
+      "Title"
+    ],
+    "service": "BusinessSettingService",
+    "function": "getCms",
+    "method": "POST",
+    "path": "/business-units/cms",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(token: string, business_unit_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "BusinessSettingService",
+    "function": "getEnvironmentVariables",
+    "method": "POST",
+    "path": "/environment-variables/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "business_unit_id"
+    ],
+    "params_signature": "(token: string, business_unit_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "update_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "BuyNowService",
+    "function": "updateProductInBuyNow",
+    "method": "PUT",
+    "path": "/buy-now-cart/update",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IupdateCartRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "BuyNowService",
+    "function": "getBuyNowCartDetails",
+    "method": "POST",
+    "path": "/buy-now-cart/one-cart",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(buy_now_cart_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "BuyNowService",
+    "function": "getBuyNowCheckoutDetails",
+    "method": "POST",
+    "path": "/buy-now-cart/one-cart-on-checkout",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(buy_now_cart_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "customerCampaignDetails",
+    "method": "POST",
+    "path": "/customer-acquisition-campaign/get-details",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "code"
+    ],
+    "params_signature": "(token: string, campaignCode: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "vendorCampaignDetails",
+    "method": "POST",
+    "path": "/vendor-acquisition-campaign/get-details",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "code"
+    ],
+    "params_signature": "(token: string, campaignCode: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "submit",
+    "method": "POST",
+    "path": "/customer-acquisition-leads/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, reqBody: ICampaignSubmitReqBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "vendorSubmit",
+    "method": "POST",
+    "path": "/vendor-acquisition-leads/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, reqBody: ICampaignSubmitReqBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "initializePayU",
+    "method": "POST",
+    "path": "/payment-provider-configurations/request",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, reqBody: IPayUReqBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "registerVendor",
+    "method": "POST",
+    "path": "/vendors/register",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: IRegisterVendorReqBody, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CampaignService",
+    "function": "validateVendorOtp",
+    "method": "POST",
+    "path": "/vendors/validate-otp",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: IvalidateVendorOtpReqBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata",
+      "list_categories"
+    ],
+    "suggested_section_types": [
+      "Grid",
+      "Logos",
+      "Menu"
+    ],
+    "service": "CategoriesService",
+    "function": "getCategories",
+    "method": "POST",
+    "path": "/categories/list-with-seo",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_id",
+      "master_catalogue_id"
+    ],
+    "params_signature": "(     master_catalogue_id: string,     token: string,     entity_id: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CheckoutService",
+    "function": "getDeliveryInstructions",
+    "method": "POST",
+    "path": "delivery-instructions/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CheckoutService",
+    "function": "getShippingDetails",
+    "method": "POST",
+    "path": "/business-units/shipping-details",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IDeliveryEstimateResponseBody,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CheckoutService",
+    "function": "getpaymentMethod",
+    "method": "GET",
+    "path": "/payment-types",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "businessUnitId"
+    ],
+    "params_signature": "(token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "gift_cards"
+    ],
+    "suggested_section_types": [],
+    "service": "CheckoutService",
+    "function": "getGiftCards",
+    "method": "POST",
+    "path": "/finance-payment-products/gift-card-analytics",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(customer_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "gift_cards"
+    ],
+    "suggested_section_types": [],
+    "service": "CheckoutService",
+    "function": "getGiftCardAnalytics",
+    "method": "POST",
+    "path": "/finance-payment-products/gift-card-analytics",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(customer_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_highlights",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Feature"
+    ],
+    "service": "CheckoutService",
+    "function": "getLastMinuteHighlight",
+    "method": "POST",
+    "path": "/highlights/list-with-last-minute-offers",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "page",
+      "page_size"
+    ],
+    "params_signature": "(token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "CmsService",
+    "function": "QAndA",
+    "method": "POST",
+    "path": "/q-and-a/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "business_unit_id",
+      "type"
+    ],
+    "params_signature": "(type: string, business_unit_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cms_content"
+    ],
+    "suggested_section_types": [
+      "Collapsible",
+      "Feature",
+      "Title"
+    ],
+    "service": "CmsService",
+    "function": "getQuestionAndAnswers",
+    "method": "POST",
+    "path": "/cms/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cms_content"
+    ],
+    "suggested_section_types": [
+      "Collapsible",
+      "Feature",
+      "Title"
+    ],
+    "service": "CmsService",
+    "function": "getCmsPages",
+    "method": "POST",
+    "path": "<unresolved:getCmsPagesEndPoint>",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "page",
+      "page_size"
+    ],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "customer_address_management"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "getAddresses",
+    "method": "POST",
+    "path": "/addresses/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     object_id: string,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "customer_address_management"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "updateAddress",
+    "method": "PUT",
+    "path": "/addresses/modify",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: addressDataInterface, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "customer_address_management"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "addAddress",
+    "method": "POST",
+    "path": "<unresolved:addCustomerAddressEndPoint>",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IAddCustomerAddressReqBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "customer_address_management"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "deleteAddress",
+    "method": "PATCH",
+    "path": "/addresses/delete",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(id: number | string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "upload_image"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "imageUploader",
+    "method": "POST",
+    "path": "/containers/${imagePath}/upload?filename=${imageName}",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     token: string,     imagePath: string,     imageName: string,     form_data: any,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "verifyCustomer",
+    "method": "POST",
+    "path": "/authentication/customer/otp",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IGetOtpRequestBody, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "getLoginOtp",
+    "method": "POST",
+    "path": "/authentication/customer/login-otp",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IGetOtpRequestBody, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "verifyLogin",
+    "method": "POST",
+    "path": "/authentication/customer/login-verify",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IValidatePinRequestBody, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "getRegisterOtp",
+    "method": "POST",
+    "path": "/authentication/customer/register-otp",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IGetOtpRequestBody, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "verifyRegister",
+    "method": "POST",
+    "path": "/authentication/customer/register-verify",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IValidatePinRequestBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "validateCustomer",
+    "method": "POST",
+    "path": "/authentication/customer/verify",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "message"
+    ],
+    "params_signature": "(requestBody: IValidatePinRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "customerProfile",
+    "method": "POST",
+    "path": "/customers/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(options?: {     customerId?: string | null;     token?: string | null;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile",
+      "update_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "updateCustomerProfile",
+    "method": "PUT",
+    "path": "/customers/update",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IUpdateCustomerReqBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "deleteCustomerProfile",
+    "method": "PATCH",
+    "path": "/customers/delete",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "message"
+    ],
+    "params_signature": "(     requestBody: IUpdateCustomerReqBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "removeTokenFromProfile",
+    "method": "POST",
+    "path": "/bulk/device-tokens",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IRequestBodyRemoveToken,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "logoutCustomerProfile",
+    "method": "GET",
+    "path": "/customers/logout",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "customer_address_management"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "getAddressesByPincode",
+    "method": "POST",
+    "path": "/customers/available-addresses",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       customer_id: string;       entity_id: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "CustomerService",
+    "function": "getActiveVouchers",
+    "method": "POST",
+    "path": "/coupons/all/customer/mobile",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     requestBody,     token,   }: {     requestBody: {       mobile: string;     };     token?: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "newsletter_subscribe"
+    ],
+    "suggested_section_types": [
+      "News_letter"
+    ],
+    "service": "email-confirmation",
+    "function": "pushSubscribeEmail",
+    "method": "POST",
+    "path": "/email-subscribe",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "newsletter_subscribe"
+    ],
+    "suggested_section_types": [
+      "News_letter"
+    ],
+    "service": "email-confirmation",
+    "function": "subscribeEmail",
+    "method": "POST",
+    "path": "/communication-subscription-customers/subscribe",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: ISubscribeEmailRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "email-confirmation",
+    "function": "sendMail",
+    "method": "POST",
+    "path": "/templates/send-mail",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: ISendMailRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_form_definition"
+    ],
+    "suggested_section_types": [
+      "Form"
+    ],
+    "service": "FormsService",
+    "function": "getFormDetail",
+    "method": "POST",
+    "path": "/form-groups/list-with-attributes",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "form_id"
+    ],
+    "params_signature": "({token, formCode}: {token?: string, formCode: string})",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "submit_form"
+    ],
+    "suggested_section_types": [
+      "Form",
+      "News_letter"
+    ],
+    "service": "FormsService",
+    "function": "submitForm",
+    "method": "POST",
+    "path": "/form-data/submit",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     token: string,     requestBody: any,     object_type: string,     object_type_id: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "FormsService",
+    "function": "checkForm",
+    "method": "POST",
+    "path": "/form-data/check",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, requestBody: any)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "HighlightService",
+    "function": "get",
+    "method": "POST",
+    "path": "/seo/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "url_slug"
+    ],
+    "params_signature": "({     token,     highlightSlug,     object_id,   }: {     token?: string;     highlightSlug?: string;     object_id?: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_highlights",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Feature"
+    ],
+    "service": "HighlightService",
+    "function": "getHighlightList",
+    "method": "POST",
+    "path": "/highlights/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "({     token,     ids,   }: {     token?: string;     ids: string[];   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "wishlist_management"
+    ],
+    "suggested_section_types": [],
+    "service": "HighlightService",
+    "function": "get",
+    "method": "POST",
+    "path": "/highlights/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "({     token,     highlightID,   }: {     token?: string;     highlightID: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "accessToken",
+    "method": "POST",
+    "path": "/authentication/customer/verify",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "message"
+    ],
+    "params_signature": "(     reqbody: IRequestBodyToken,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "pgAccessToken",
+    "method": "POST",
+    "path": "/token",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_stores"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getStores",
+    "method": "POST",
+    "path": "/business-units/default-entity",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IConfirmLocationPincodeLatLngI,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_stores"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getStoreByEntityId",
+    "method": "POST",
+    "path": "/entities/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(store_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_stores"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getStoreCountries",
+    "method": "POST",
+    "path": "/countries/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(storeCountriesId: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getSeviceableLocations",
+    "method": "POST",
+    "path": "/serviceable-locations/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_stores"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getExperienceStore",
+    "method": "POST",
+    "path": "/entities/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "is_experience_entity"
+    ],
+    "params_signature": "(token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getEntityList",
+    "method": "POST",
+    "path": "/entities/list/ecom",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "active_flag",
+      "business_unit_id",
+      "category_id",
+      "page_size",
+      "show_in_store_locator"
+    ],
+    "params_signature": "(     business_unit_id: string,     entity_category_id: string,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getOneEntity",
+    "method": "POST",
+    "path": "/entities/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(id: string, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "HomeService",
+    "function": "getEntityCategory",
+    "method": "POST",
+    "path": "/entity-categories/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_type"
+    ],
+    "params_signature": "(entity_type: string, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "upload_image"
+    ],
+    "suggested_section_types": [],
+    "service": "ImageUploadService",
+    "function": "uploadImage",
+    "method": "POST",
+    "path": "/customers/file/upload",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     input: FormData | File | Blob,     uploadContainer: string = \"gift_registry\",   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ImageUploadService",
+    "function": "uploadCustomerFile",
+    "method": "POST",
+    "path": "/customers/file/upload",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     input: FormData | File | Blob,     uploadContainer: string = \"gift_registry\",   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "get",
+    "method": "POST",
+    "path": "/redemption/conversion-value",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       mobile: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "loyaltyPointsConversion",
+    "method": "POST",
+    "path": "/redemption/conversion-value",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       points: number;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile",
+      "list_stores",
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "getLoyaltyHistoryCustomerDetails",
+    "method": "POST",
+    "path": "/loyalty-history/get-customer-details?client=Turtle&storeCode=63&source=Ginesys",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     token,     reqBody,   }: {     token: string;     reqBody: {       mobile: string;     };   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "getCustomerDetails",
+    "method": "POST",
+    "path": "/customers/get-details",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     token,     reqBody,   }: {     token: string;     reqBody: {       referenceCode: string;     };   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "redeemLoyaltyPoints",
+    "method": "POST",
+    "path": "/customers/redeem-loyalty-points",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     token,     reqBody,   }: {     token: string;     reqBody: IRedeemPointsReqBody;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "clearReservedLoyaltyPoints",
+    "method": "POST",
+    "path": "/customers/clear-reserve-loyalty-points",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     token,     reqBody,   }: {     token: string;     reqBody: IClearLoyaltyPointsReqBody;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "getCustomerLoyaltyHistory",
+    "method": "POST",
+    "path": "/loyalty-history/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     customer_id,     page,     page_size,     token,   }: {     customer_id: string;     page: number;     page_size: number;     token?: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile",
+      "loyalty_points"
+    ],
+    "suggested_section_types": [],
+    "service": "loyalty-services",
+    "function": "getAllowedLoyaltyPoints",
+    "method": "POST",
+    "path": "/customers/get-allowed-loyalty-details",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "amount",
+      "business_unit_id",
+      "customer_id"
+    ],
+    "params_signature": "({     business_unit_id,     amount,   }: {     business_unit_id: string;     amount: number;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getOrdersHistory",
+    "method": "POST",
+    "path": "/parent-sales-orders/ecom-list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "channel",
+      "customer_id",
+      "customer_mobile",
+      "page",
+      "page_size",
+      "type"
+    ],
+    "params_signature": "({     page = 1,     type = \"\",   }: {     page?: number;     type?: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getReturnedOrdersHistory",
+    "method": "POST",
+    "path": "/parent-sales-returns/ecom-list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "channel",
+      "customer_id",
+      "customer_mobile",
+      "page",
+      "page_size"
+    ],
+    "params_signature": "({ page = 1 }: { page?: number })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getExchangedOrdersHistory",
+    "method": "POST",
+    "path": "/parent-sales-orders/ecom-list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "channel",
+      "customer_id",
+      "customer_mobile",
+      "page",
+      "page_size",
+      "type"
+    ],
+    "params_signature": "({ page = 1 }: { page?: number })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getOneOrderHistory",
+    "method": "POST",
+    "path": "<unresolved:type>",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(order_id: string, type: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getSalesOrderDetails",
+    "method": "POST",
+    "path": "<unresolved:type>",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(order_id: string, type: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getPosOrders",
+    "method": "POST",
+    "path": "/parent-sales-orders/ecom-list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "channel",
+      "customer_id",
+      "customer_mobile",
+      "page",
+      "page_size"
+    ],
+    "params_signature": "(     page: number,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getPosOrdersById",
+    "method": "POST",
+    "path": "/sales-orders/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     token: string,     reqBody: {       id: string;     },   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getThankuPageDetails",
+    "method": "POST",
+    "path": "/sales-orders/thankyou",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "code"
+    ],
+    "params_signature": "(order_code: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "cancel_order"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getOrderReason",
+    "method": "POST",
+    "path": "/sales-orders/cancel-status-reasons",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "createOrder",
+    "method": "POST",
+    "path": "<unresolved:endpoint>",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: ICartOrderRequest,     options?: { isBuyNow?: boolean },   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "createExchangeOrder",
+    "method": "POST",
+    "path": "/exchanges/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IExchangeOrderPayload)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "cancel_order"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "cancelOrder",
+    "method": "POST",
+    "path": "/sales-orders/cancel",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: ICancelOrderReqBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "invoiceDownload",
+    "method": "POST",
+    "path": "/sales-orders/invoice/download",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "format",
+      "id",
+      "pdf"
+    ],
+    "params_signature": "(orderId: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "trackGuestOrder",
+    "method": "POST",
+    "path": "/parent-sales-orders/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "code"
+    ],
+    "params_signature": "({     code,     contact,     token,   }: {     code: string;     contact: string;     token: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getTrackingSequence",
+    "method": "POST",
+    "path": "/status-profiles/tracking",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "object_type",
+      "sales_order_id"
+    ],
+    "params_signature": "(     token: string,     sales_order_id: string | undefined,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "cancel_order"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "cancelOrderItem",
+    "method": "POST",
+    "path": "/sales-orders/cancel-item",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     sales_order_id: string,     order_product_id: string,     quantity: number,     cancel_reason: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "orders-service",
+    "function": "getReturnReason",
+    "method": "POST",
+    "path": "/sales-returns/cancel-status-reasons",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "search_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid",
+      "Search"
+    ],
+    "service": "ProductService",
+    "function": "searchByProducts",
+    "method": "POST",
+    "path": "/entity-products/list-based-on-source",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: seachForProductRequestBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_size_chart"
+    ],
+    "suggested_section_types": [
+      "ProductCard",
+      "Specification"
+    ],
+    "service": "ProductService",
+    "function": "getSizeChartInfo",
+    "method": "POST",
+    "path": "/types/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(typeId: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getSpecialProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: IRequestBodySpecialProducts,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getSpecialProductsById",
+    "method": "POST",
+    "path": "/entity-products/slug",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: IRequestBodySpecialProductsById,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getV2ProductsById",
+    "method": "POST",
+    "path": "/entity-products/one-based-on-source",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(product_id: string[], token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_product_specifications"
+    ],
+    "suggested_section_types": [
+      "Specification"
+    ],
+    "service": "ProductService",
+    "function": "getSpecialProductsSpecifications",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/filters",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: Partial<IRequestBodySpecialProductsById>,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_filter_options"
+    ],
+    "suggested_section_types": [
+      "Collections (filter UI)"
+    ],
+    "service": "ProductService",
+    "function": "getSpecialProductsOptions",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/filters/options",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: Partial<IRequestBodySpecialProductsById>,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_categories",
+      "list_highlights"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Feature",
+      "Grid",
+      "Logos",
+      "Menu"
+    ],
+    "service": "ProductService",
+    "function": "getHighlightCatalogue",
+    "method": "POST",
+    "path": "/categories/list-by-highlight",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: Partial<IRequestBodyHighlightCatalogue>,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_categories",
+      "search_products"
+    ],
+    "suggested_section_types": [
+      "Grid",
+      "Logos",
+      "Menu",
+      "Search"
+    ],
+    "service": "ProductService",
+    "function": "getSearchPageCatalogue",
+    "method": "POST",
+    "path": "/categories/list-by-search-key",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: Partial<IRequestBodySearchPageCatalogue>,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "search_suggestions"
+    ],
+    "suggested_section_types": [
+      "Search"
+    ],
+    "service": "ProductService",
+    "function": "searchSuggestion",
+    "method": "POST",
+    "path": "/entity-products/search-suggestions",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: {       business_unit_id: string;       query: string;       limit: number;     },     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "wishlist_management"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "saveFeed",
+    "method": "POST",
+    "path": "/customers/add-highlight",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: { customer_id: string; highlight_id: string })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "wishlist_management"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "removeFeed",
+    "method": "POST",
+    "path": "/customers/remove-highlight",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: {     customer_id: string;     highlight_id: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "wishlist_management"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getSavedFeed",
+    "method": "POST",
+    "path": "/customers/get-highlights",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: { customer_id: string })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "trending_searches"
+    ],
+    "suggested_section_types": [
+      "Search"
+    ],
+    "service": "ProductService",
+    "function": "getsearcingKeywords",
+    "method": "POST",
+    "path": "/trending-keywords/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "addVisitorAnalytics",
+    "method": "POST",
+    "path": "/sales-orders/alternate-uom-calculations",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, data: any)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "deleteScalableProduct",
+    "method": "POST",
+    "path": "/sales-orders/alternate-uom-calculations",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: any, _: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getPriceForScalableProduct",
+    "method": "POST",
+    "path": "/sales-orders/alternate-uom-calculations",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IScalableProductRequest)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_product_detail"
+    ],
+    "suggested_section_types": [
+      "ProductCard"
+    ],
+    "service": "ProductService",
+    "function": "fetchSingleProduct",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/one/slug",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "products"
+    ],
+    "params_signature": "(     productSlug: string,     token: string,     entity_id: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "fetchSeoOfProduct",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "related_products_flag_required",
+      "similar_products_flag_required"
+    ],
+    "params_signature": "(     product_id: string | string[],     entity_id: string,     token?: string,     related_products_flag_required?: boolean,     similar_products_flag_required?: boolean,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "list_similar_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Compare",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getSimilarProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/similar-products/list",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "attribute_id",
+      "brand_id",
+      "entity_id",
+      "extra_label_id",
+      "field_values",
+      "gte",
+      "lte",
+      "min_retail_price",
+      "options",
+      "page",
+      "page_size",
+      "product_id",
+      "sort",
+      "specifications"
+    ],
+    "params_signature": "(params: {     product_id: string;     entity_id: string;     token: string;     pageSize: number;     page: number;     minPrice?: number;     maxPrice?: number;     selectedFilter?: {       label?:",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "list_related_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getRelatedProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/related-products/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_id",
+      "page",
+      "page_size",
+      "product_id"
+    ],
+    "params_signature": "(     product_id: string,     entity_id: string,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_complementary_products",
+      "list_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getComplimentaryProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/complimentary-products/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_id",
+      "page",
+      "page_size",
+      "product_id"
+    ],
+    "params_signature": "(product_id: string, entity_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_cross_sell_products",
+      "list_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getCrossSellingProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/cross-selling-products/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_id",
+      "page",
+      "page_size",
+      "product_id"
+    ],
+    "params_signature": "(     productId: string,     storeId: string,     _token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_stock_details"
+    ],
+    "suggested_section_types": [
+      "ProductCard"
+    ],
+    "service": "ProductService",
+    "function": "getStockDetails",
+    "method": "POST",
+    "path": "/entity-products/other-entities",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(reqBody: IProductStockDetailsRequest)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_best_sellers"
+    ],
+    "suggested_section_types": [
+      "Best"
+    ],
+    "service": "ProductService",
+    "function": "getBestSellerProducts",
+    "method": "POST",
+    "path": "/sections/products",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: IRequestBodyProduct,     storeId: string,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "ProductService",
+    "function": "getAllProducts",
+    "method": "POST",
+    "path": "/entity-products/source-ecom/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     reqBody: {       entity_id: string;       page: number;       page_size: number;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getPromotionalSearch",
+    "method": "POST",
+    "path": "/promotional-search/ecom/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "entity_id"
+    ],
+    "params_signature": "(     entity_id: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_ornaments"
+    ],
+    "suggested_section_types": [],
+    "service": "ProductService",
+    "function": "getOrnamentsList",
+    "method": "POST",
+    "path": "/ornaments/source-ecom/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "({     latitude,     longitude,     pincode,     variant_id,     sales_entity_id,   }: IOrnamentsListRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order",
+      "list_product_reviews",
+      "submit_review"
+    ],
+    "suggested_section_types": [
+      "Compare",
+      "ProductCard"
+    ],
+    "service": "rating-service",
+    "function": "orderReview",
+    "method": "POST",
+    "path": "/products-reviews/ecom/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       rating: number;       content: string;       entityInternalId: string;       orderId: string;       status: string;       customerId: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order",
+      "list_product_reviews",
+      "submit_review"
+    ],
+    "suggested_section_types": [
+      "Compare",
+      "ProductCard"
+    ],
+    "service": "rating-service",
+    "function": "checkOrderReviewSubmission",
+    "method": "POST",
+    "path": "/products-reviews/ecom/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       entityInternalId: string;       orderId: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order",
+      "list_product_reviews",
+      "submit_review"
+    ],
+    "suggested_section_types": [
+      "Compare",
+      "ProductCard"
+    ],
+    "service": "rating-service",
+    "function": "orderProductReview",
+    "method": "POST",
+    "path": "/products-reviews/ecom/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: ICreateProductReviewsRequestBody[],     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_product_reviews",
+      "submit_review"
+    ],
+    "suggested_section_types": [
+      "Compare",
+      "ProductCard"
+    ],
+    "service": "rating-service",
+    "function": "createEcomProductReview",
+    "method": "POST",
+    "path": "/products-reviews/ecom/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IProductReviewRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_order"
+    ],
+    "suggested_section_types": [],
+    "service": "return-order-service",
+    "function": "createReturnOrder",
+    "method": "POST",
+    "path": "/sales-returns/create-multi",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: ICreateReturnOrderRequestBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "return-order-service",
+    "function": "getOrderCalculationForReturn",
+    "method": "POST",
+    "path": "/sales-returns/serve-multi",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IReturnOrderCalculationRequestBody,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "return-order-service",
+    "function": "getReturnReasons",
+    "method": "POST",
+    "path": "/sales-returns/cancel-status-reasons",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "category",
+    "method": "POST",
+    "path": "/direct/seo/category",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "slug"
+    ],
+    "params_signature": "(slug: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "listPage",
+    "method": "POST",
+    "path": "<unresolved:getSeoEndpoint>",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "default"
+    ],
+    "params_signature": "(slug: string | string[])",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "subCategory",
+    "method": "POST",
+    "path": "/direct/seo/sub-category",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "slug"
+    ],
+    "params_signature": "(slug: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "classfication",
+    "method": "POST",
+    "path": "/direct/seo/classification",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "slug"
+    ],
+    "params_signature": "(slug: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "highlight",
+    "method": "POST",
+    "path": "/direct/seo/highlight",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "slug"
+    ],
+    "params_signature": "(slug: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_seo_metadata"
+    ],
+    "suggested_section_types": [],
+    "service": "SeoService",
+    "function": "product",
+    "method": "POST",
+    "path": "/direct/seo/product",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "slug"
+    ],
+    "params_signature": "(slug: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_cart",
+      "get_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getCartId",
+    "method": "POST",
+    "path": "/cart/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, requestBody: IGetCartId)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getCampaignCoupon",
+    "method": "POST",
+    "path": "/coupons/all/customer/mobile",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       mobile: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cart",
+      "list_stores",
+      "update_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "addProduct",
+    "method": "PUT",
+    "path": "/stores/${storeId}/shopping-carts/carts/${cart_id}/products?filterType=CartDetails",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "locationId"
+    ],
+    "params_signature": "(     requestBody: IAddToProductRequestBody,     cart_id: string,     storeId: string,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "apply_coupon"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "promoCodeValidate",
+    "method": "POST",
+    "path": "/coupons/apply",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IPromoCodeApply, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "refferValidation",
+    "method": "POST",
+    "path": "/agents/referral",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "code"
+    ],
+    "params_signature": "(code: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "cartProductOffers",
+    "method": "POST",
+    "path": "/coupons/customer",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getAvailableBillBusterOffers",
+    "method": "POST",
+    "path": "/bill-buster/available-list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IBillBusterAvailableListRequest,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "applyBillBuster",
+    "method": "POST",
+    "path": "/bill-buster/apply",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IBillBusterApplyRequest,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "removeBillBuster",
+    "method": "POST",
+    "path": "/bill-buster/remove",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IBillBusterRemoveRequest,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_customer_profile",
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "profileCoupon",
+    "method": "POST",
+    "path": "/coupons/all/customer/mobile",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "singleCouponDetails",
+    "method": "POST",
+    "path": "/coupons/single",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       code: string;       mobile: string;       mrp: number;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "couponProductOffers",
+    "method": "POST",
+    "path": "/coupons/all/customer/mobile",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "apply_coupon",
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "sendCouponOTPValidate",
+    "method": "POST",
+    "path": "/coupons/send-otp",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: ICouponSendOtp, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "authentication"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "sendOtpForInternalPromo",
+    "method": "POST",
+    "path": "<unresolved:sendOtpEndPoints>",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: {       mobile: string;       code: string;       sales_entity_id: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_coupons"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getCustomerCoupon",
+    "method": "POST",
+    "path": "/coupons/single",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IGetCustomerCouponRequestBoady,     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "update_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "updateCart",
+    "method": "PUT",
+    "path": "/cart/update",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: IupdateCartRequestBody, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "reorderCheck",
+    "method": "POST",
+    "path": "/cart/reorder-check",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     requestBody: IReorderCheckRequestBody,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_order_history"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getOrderIdByPaymentOrderId",
+    "method": "POST",
+    "path": "/transactions/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "payment_order_id"
+    ],
+    "params_signature": "(payment_order_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getCartDetails",
+    "method": "POST",
+    "path": "<unresolved:isGuest>",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "()",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_cart"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "getCheckoutDetails",
+    "method": "POST",
+    "path": "/cart/one-cart-on-checkout",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody?: any)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "ShoppingCartService",
+    "function": "exchangeServe",
+    "method": "POST",
+    "path": "/exchanges/serve",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: ExchangeServerRequestBody)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "search_suggestions"
+    ],
+    "suggested_section_types": [
+      "Search"
+    ],
+    "service": "suggest-product-services",
+    "function": "SuggestProduct",
+    "method": "POST",
+    "path": "/entity-products/search-suggestions",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     token: string,     requestBody: ISuggestProductRequest,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "suggest-product-services",
+    "function": "suggestNewProduct",
+    "method": "POST",
+    "path": "/product-requests/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     token: string,     requestBody: ISuggestNewProductRequest,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_theme_page_data"
+    ],
+    "suggested_section_types": [],
+    "service": "ThemeService",
+    "function": "getThemeData",
+    "method": "POST",
+    "path": "/direct/direct-theme/publish-pages",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "message"
+    ],
+    "params_signature": "({     channel,     formData,   }: {     channel: ChannelType;     formData: IthemeFormDataInterface | IThemeDataPageIds;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_theme_page_data"
+    ],
+    "suggested_section_types": [],
+    "service": "ThemeService",
+    "function": "getGenericHeaderFooter",
+    "method": "POST",
+    "path": "/direct/direct-theme/pages/generic",
+    "requires_auth": false,
+    "request_body_fields_guess": [],
+    "params_signature": "({     channel,     business_unit_id,   }: {     channel: ChannelType;     business_unit_id: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_theme_page_data"
+    ],
+    "suggested_section_types": [],
+    "service": "ThemeService",
+    "function": "getSinglePageData",
+    "method": "POST",
+    "path": "/direct/direct-theme/publish-pages",
+    "requires_auth": false,
+    "request_body_fields_guess": [
+      "channel",
+      "draft_page_id",
+      "page_name",
+      "process_page"
+    ],
+    "params_signature": "({     page_id,     page_name,     channel,   }: {     page_id?: string;     page_name?: string;     channel: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_theme_page_data"
+    ],
+    "suggested_section_types": [],
+    "service": "ThemeService",
+    "function": "getProductcard",
+    "method": "POST",
+    "path": "/direct/direct-theme/publish-pages",
+    "requires_auth": false,
+    "request_body_fields_guess": [],
+    "params_signature": "(     channel: ChannelType,     requestBody: IThemeDataPageIds,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "WishListService",
+    "function": "getWishlistProductIds",
+    "method": "POST",
+    "path": "/customer-favourite/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     _: string,     customer_id: string,     token?: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "WishListService",
+    "function": "getWishlistProducts",
+    "method": "POST",
+    "path": "<unresolved:variants>",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "message",
+      "page",
+      "page_size"
+    ],
+    "params_signature": "(     entity_id: string,     product_id: string[],     token: string,     variants = false,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "wishlist_management"
+    ],
+    "suggested_section_types": [],
+    "service": "WishListService",
+    "function": "deleteBasketPrd",
+    "method": "PUT",
+    "path": "/customers/wishlists",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(data: any, _: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "WishListService",
+    "function": "deleteWishlistProduct",
+    "method": "PATCH",
+    "path": "/customer-favourite/products/delete",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "products"
+    ],
+    "params_signature": "(     product_id: string,     token: string,     customer_id: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_products",
+      "update_customer_profile",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Best",
+      "Collections",
+      "Feature",
+      "Grid"
+    ],
+    "service": "WishListService",
+    "function": "addProductToWishlist",
+    "method": "PUT",
+    "path": "/customer-favourite/products/update",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(requestBody: any, token?: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_collections",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Collections"
+    ],
+    "service": "WishListService",
+    "function": "getWishlistCollections",
+    "method": "POST",
+    "path": "/collections/list",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(token: string, customer_id: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "get_collection_detail",
+      "list_collections",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Collections",
+      "Title"
+    ],
+    "service": "WishListService",
+    "function": "getWishlistCollectionsById",
+    "method": "POST",
+    "path": "/collections/one",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id",
+      "slug"
+    ],
+    "params_signature": "({     collection_id,     slug,     token,   }: {     collection_id?: string;     slug?: string | undefined | null;     token: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "create_collection",
+      "list_collections",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Collections"
+    ],
+    "service": "WishListService",
+    "function": "createWishlistCollection",
+    "method": "POST",
+    "path": "/collections/create",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(data: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "list_collections",
+      "update_collection",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Collections"
+    ],
+    "service": "WishListService",
+    "function": "updateWishlistCollection",
+    "method": "PUT",
+    "path": "/collections/update",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(data: any, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "delete_collection",
+      "list_collections",
+      "wishlist_management"
+    ],
+    "suggested_section_types": [
+      "Collections"
+    ],
+    "service": "WishListService",
+    "function": "deleteWishlistCollection",
+    "method": "POST",
+    "path": "/collections/delete",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "id"
+    ],
+    "params_signature": "(collection_id: string, token: string)",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "WishListService",
+    "function": "addSharedCollection",
+    "method": "POST",
+    "path": "/customers/add-shared-collection",
+    "requires_auth": true,
+    "request_body_fields_guess": [
+      "collection_id",
+      "customer_id"
+    ],
+    "params_signature": "({     customer_id,     collection_id,   }: {     customer_id: string;     collection_id: string;     token: string;   })",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  },
+  {
+    "capability": [
+      "uncategorized"
+    ],
+    "suggested_section_types": [],
+    "service": "WishListService",
+    "function": "getSharedCollectionInformation",
+    "method": "POST",
+    "path": "/customers/get-shared-collection-information",
+    "requires_auth": true,
+    "request_body_fields_guess": [],
+    "params_signature": "(     data: {       customer_id: string;       collection_id: string;     },     token: string,   )",
+    "notes": "request_body_fields_guess is extracted heuristically from source and MUST be verified against actual backend/API docs before use in production binding."
+  }
+]
