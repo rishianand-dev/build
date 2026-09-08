@@ -1,8 +1,9 @@
-import type { DomNode, PageCapture } from "../types/page-capture.js";
-import { internAsset, internStyle, internToken, prune } from "../schema/compact.js";
+import type { Box, DomNode, PageCapture } from "../types/page-capture.js";
+import { internAsset, internStyle, internToken, prune, walkPaths } from "../schema/compact.js";
 import { emptyTheme, type BindMap, type Node, type ThemeDoc } from "../schema/theme.js";
 import { cssColorToHex, luminance, saturations } from "./color.js";
 import { attachConnectedPages, internalNavHref, slugify } from "./connected-pages.js";
+import { setVisionCandidates, type VisionCandidate } from "./from-vision.js";
 
 function walk(node: DomNode, visit: (n: DomNode) => void): void {
   visit(node);
@@ -316,7 +317,11 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
   if (!root) {
     review.push({ path: "/pages/0", reason: "Capture has no DOM snapshot", confidence: 0 });
     theme.pages = [{ id: "home", path: "/", name: "Home", title: capture.title, root: { type: "stack", children: [] } }];
-    return prune(theme) as ThemeDoc;
+    const pruned = prune(theme) as ThemeDoc;
+    setVisionCandidates(pruned, [
+      { path: "/pages/0/root", reason: "Capture has no DOM snapshot — nothing for heuristics to work from" },
+    ]);
+    return pruned;
   }
 
   const headerEl = findHeaderNode(root);
@@ -332,6 +337,7 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
   const seenMedia = new Set<string>();
   const catalog: BindMap[] = [];
   const slugs = new Set<string>();
+  const visionCandidates: Array<{ node: Node; box?: Box; reason: string }> = [];
   const ctx: BuildCtx = {
     theme,
     capture,
@@ -347,6 +353,7 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     slugs,
     headerEl,
     footerEl,
+    visionCandidates,
   };
 
   const body: Node[] = [];
@@ -409,7 +416,22 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     });
   }
   theme.review = review;
-  return prune(theme) as ThemeDoc;
+
+  // Resolve vision-candidate node identities to JSON pointers while the
+  // tree is still live (prune() below deep-copies, which would break
+  // reference equality) and stash them on the returned object.
+  const resolved: VisionCandidate[] = [];
+  if (visionCandidates.length) {
+    const byNode = new Map<Node, string>();
+    theme.pages.forEach((page, i) => walkPaths(page.root, `/pages/${i}/root`, (n, path) => byNode.set(n, path)));
+    for (const candidate of visionCandidates) {
+      const path = byNode.get(candidate.node);
+      if (path) resolved.push({ path, box: candidate.box, reason: candidate.reason });
+    }
+  }
+  const pruned = prune(theme) as ThemeDoc;
+  if (resolved.length) setVisionCandidates(pruned, resolved);
+  return pruned;
 }
 
 interface BuildCtx {
@@ -427,6 +449,7 @@ interface BuildCtx {
   slugs: Set<string>;
   headerEl?: DomNode;
   footerEl?: DomNode;
+  visionCandidates: Array<{ node: Node; box?: Box; reason: string }>;
 }
 
 function findHeaderNode(root: DomNode): DomNode | undefined {
@@ -937,11 +960,19 @@ function screenshotHero(ctx: BuildCtx, node: DomNode): Node | null {
   if (node.box.y > 900) return null;
   ctx.seenMedia.add(rel);
   const id = internAsset(ctx.theme.assets, rel, { kind: "image", w: node.box.width, h: node.box.height });
-  return {
+  const result: Node = {
     type: "stack",
     role: "hero",
     children: [{ type: "image", asset: id, style: ctx.heroStyle, alt: ctx.capture.title }],
   };
+  // Whole-image dump with a generic "hero" guess, not a real classification
+  // — a good candidate for the vision fallback to upgrade with a real role.
+  ctx.visionCandidates.push({
+    node: result,
+    box: node.box,
+    reason: "Heuristics fell back to a whole-screenshot crop for this region",
+  });
+  return result;
 }
 
 function viewAllLink(node: DomNode): Node | null {

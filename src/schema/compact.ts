@@ -135,6 +135,48 @@ function walkNodes(node: Node, visit: (n: Node) => void): void {
   }
 }
 
+/**
+ * Walk a node tree, visiting each node with its JSON pointer from the
+ * document root. `base` is the pointer to `root` itself, e.g.
+ * `/pages/0/root` or `/components/c1/root`.
+ */
+export function walkPaths(root: Node, base: string, visit: (n: Node, path: string) => void): void {
+  const go = (node: Node, path: string) => {
+    visit(node, path);
+    if ("children" in node && node.children) {
+      node.children.forEach((child, i) => go(child, `${path}/children/${i}`));
+    }
+  };
+  go(root, base);
+}
+
+/**
+ * Inverse of `walkPaths`: resolves a JSON pointer produced by it (or
+ * `ReviewItem.path`) back to the live node it names, so a caller can read
+ * or mutate it in place. Only understands pointers of the shape
+ * `/pages/<i>/root(/children/<i>)*` or `/components/<id>/root(/children/<i>)*`
+ * — anything else (including the coarser page-level pointers some
+ * ReviewItems still use, e.g. `/pages/0`) returns undefined.
+ */
+export function resolveNodeAtPath(theme: ThemeDoc, path: string): Node | undefined {
+  const segs = path.split("/").filter(Boolean);
+  let cursor: Node | undefined;
+  if (segs[0] === "pages" && segs[2] === "root") {
+    cursor = theme.pages[Number(segs[1])]?.root;
+    segs.splice(0, 3);
+  } else if (segs[0] === "components" && segs[2] === "root") {
+    cursor = theme.components[segs[1]!]?.root;
+    segs.splice(0, 3);
+  } else {
+    return undefined;
+  }
+  for (let i = 0; i < segs.length; i += 2) {
+    if (segs[i] !== "children" || !cursor || !("children" in cursor)) return undefined;
+    cursor = cursor.children[Number(segs[i + 1])];
+  }
+  return cursor;
+}
+
 function nodeWeight(node: Node): number {
   let n = 1;
   if ("children" in node) n += node.children.reduce((sum, c) => sum + nodeWeight(c), 0);

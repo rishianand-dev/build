@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { extname } from "node:path";
+import { resolveAssetFile } from "./assets.js";
 import { loginUser, registerUser, revokeToken, userFromToken } from "./auth.js";
 import {
   HttpError,
@@ -20,6 +21,12 @@ const MIME: Record<string, string> = {
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".avif": "image/avif",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
   ".json": "application/json",
 };
 
@@ -180,6 +187,19 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
       res.statusCode = 200;
       res.setHeader("Content-Type", MIME[extname(abs).toLowerCase()] ?? "application/octet-stream");
       res.setHeader("Cache-Control", "public, max-age=3600");
+      createReadStream(abs).pipe(res);
+      return true;
+    }
+
+    const assetMatch = path.match(/^\/api\/assets\/([^/]+)$/);
+    if (method === "GET" && assetMatch) {
+      // Content-addressed and shared across users/captures (no ownership
+      // check beyond being signed in) — knowing the hash is enough, same
+      // as any content-addressed store.
+      const abs = await resolveAssetFile(decodeURIComponent(assetMatch[1]!));
+      res.statusCode = 200;
+      res.setHeader("Content-Type", MIME[extname(abs).toLowerCase()] ?? "application/octet-stream");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       createReadStream(abs).pipe(res);
       return true;
     }
