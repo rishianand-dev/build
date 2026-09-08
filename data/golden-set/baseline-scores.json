@@ -1,9 +1,9 @@
 {
-  "banner": 0,
-  "header": 1,
-  "hero": 0.5333333333333333,
-  "collections": 0.8717948717948718,
+  "banner": 0.14814814814814814,
+  "header": 0.7142857142857143,
+  "hero": 0.6,
+  "collections": 0.8837209302325582,
+  "carousel": 0.375,
   "newsletter": 0.6666666666666666,
-  "footer": 1,
-  "carousel": 0
+  "footer": 1
 }
