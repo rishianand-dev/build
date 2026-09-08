@@ -1,6 +1,7 @@
 export function cssColorToHex(input: string): string | null {
   const v = input.trim().toLowerCase();
-  if (!v || v === "transparent" || v === "inherit" || v === "currentcolor") return null;
+  if (!v || v === "transparent" || v === "inherit" || v === "currentcolor")
+    return null;
   if (v.startsWith("#")) {
     if (v.length === 4) {
       return `#${v[1]}${v[1]}${v[2]}${v[2]}${v[3]}${v[3]}`;
@@ -8,7 +9,9 @@ export function cssColorToHex(input: string): string | null {
     if (v.length === 7) return v;
     return null;
   }
-  const m = v.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  const m = v.match(
+    /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/,
+  );
   if (!m) return null;
   const a = m[4] === undefined ? 1 : Number(m[4]);
   if (a < 0.2) return null;

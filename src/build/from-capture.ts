@@ -1167,15 +1167,20 @@ function buildNewsletter(node: DomNode, ctx: BuildCtx): Node[] {
 }
 
 function substantialKids(node: DomNode): DomNode[] {
-  return visibleKids(node).filter((k) => k.box.height >= 24 && k.box.width >= 40);
+  return visibleKids(node).filter((k) => k.box.height >= 16 && k.box.width >= 40);
 }
 
 function unwrapOnce(node: DomNode): DomNode {
   let n = node;
   for (let i = 0; i < 5; i++) {
     const kids = substantialKids(n);
-    if (kids.length === 1 && kids[0]!.box.width >= n.box.width * 0.7) n = kids[0]!;
-    else break;
+    if (
+      kids.length === 1 &&
+      kids[0]!.box.width >= n.box.width * 0.7 &&
+      kids[0]!.box.height >= n.box.height * 0.85
+    ) {
+      n = kids[0]!;
+    } else break;
   }
   return n;
 }
