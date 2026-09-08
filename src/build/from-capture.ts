@@ -313,7 +313,7 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     },
   };
 
-  const root = capture.dom;
+  const root = capture.dom ? unwrapBodyRoot(capture.dom) : capture.dom;
   if (!root) {
     review.push({ path: "/pages/0", reason: "Capture has no DOM snapshot", confidence: 0 });
     theme.pages = [{ id: "home", path: "/", name: "Home", title: capture.title, root: { type: "stack", children: [] } }];
@@ -702,6 +702,38 @@ function isWrapper(node: DomNode, kids: DomNode[]): boolean {
   if (kids.length === 1 && kids[0]!.box.height >= node.box.height * 0.55) return true;
   const fullWidth = kids.filter((k) => k.box.width >= node.box.width * 0.7 && k.box.height >= 80);
   return fullWidth.length >= 3 && node.box.height > 800;
+}
+
+/**
+ * Descends through single-child wrapper divs (e.g. a framework's `#__next`/
+ * `#root` mount node wrapping header+main+footer in one pass-through div)
+ * before themeFromCapture's top-level loop reads `root.children`. That loop
+ * assumes root.children are roughly flat top-level sections (header, a few
+ * content blocks, footer) and skips any child that *contains* the detected
+ * footer element — correct for a flat `<body><header/><main/><footer/></body>`,
+ * but wrong when a real SPA nests all three under one wrapper: without this,
+ * the one wrapper child "contains the footer" and the whole page — header,
+ * every content section, all of it — gets silently dropped, not just the
+ * footer. `body`/`main` tags always match `isWrapper`, so this always at
+ * least evaluates body's own single real child, not just a no-op.
+ */
+function unwrapBodyRoot(node: DomNode): DomNode {
+  let current = node;
+  for (let i = 0; i < 12; i++) {
+    const kids = visibleKids(current);
+    if (kids.length !== 1 || !isWrapper(current, kids)) break;
+    const only = kids[0]!;
+    // Never flatten into a <section> — it's a real content unit (isWrapper
+    // itself refuses to unwrap one for exactly this reason), not a pass-
+    // through div. `<body><section>(h1, p)</section></body>` must stay
+    // rooted at body with `[section]` as its one child, so buildBlock sees
+    // the section as a whole and extracts its heading+copy together —
+    // descending into it would scatter its own children (h1, p) as
+    // unrelated top-level siblings instead.
+    if (only.tag === "section") break;
+    current = only;
+  }
+  return current;
 }
 
 function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
