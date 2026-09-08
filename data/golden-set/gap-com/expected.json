@@ -1,0 +1,11 @@
+[
+  { "role": "banner", "note": "top black brand-family bar: Gap Factory / Old Navy / Banana Republic / Athleta" },
+  { "role": "banner", "note": "'The Labor Day Event ends in 21h 18m 54s' countdown bar" },
+  { "role": "header", "note": "Gap logo, Women/Men/Girls/Boys/Baby & Toddler/Accessories/GapX nav, search" },
+  { "role": "carousel", "note": "'GAP BAG' hero with visible pause/next controls" },
+  { "role": "carousel", "note": "'Reset your sweats' hero with visible prev/pause controls" },
+  { "role": "collections", "note": "'For every generation' — Women/Men/Kids/Baby & Toddler image tiles, no price" },
+  { "role": "carousel", "note": "'encore' hero with visible prev/pause controls" },
+  { "role": "newsletter", "note": "'Sign up for email' capture with Sign up button" },
+  { "role": "footer", "note": "Customer Support/Gap Good Rewards/About Us/Find Us link columns + social icons + copyright" }
+]

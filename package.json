@@ -12,6 +12,7 @@
     "build:web": "vite build --config web/vite.config.ts",
     "preview": "vite preview --config web/vite.config.ts",
     "capture": "tsx src/cli.ts capture",
+    "eval:golden": "tsx src/eval/run.ts",
     "playwright:install": "playwright install chromium",
     "test": "vitest run",
     "test:watch": "vitest",

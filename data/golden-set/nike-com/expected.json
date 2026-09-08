@@ -1,0 +1,8 @@
+[
+  { "role": "banner", "note": "top slim promo bar: 'Enjoy 15% Off On The Nike App'" },
+  { "role": "header", "note": "logo, New & Featured/Men/Women/Kids/Jordan/Sale nav, search/wishlist/cart icons" },
+  { "role": "carousel", "note": "full-bleed 'ELEVATE YOUR PRE-GAME ROUTINE' banner with visible pagination dots + prev/next arrows" },
+  { "role": "collections", "note": "'Trending' — 3 image tiles with 'Shop'/'Shop Footwear' CTAs, no visible price" },
+  { "role": "carousel", "note": "'Styles For The Fam' — priced product cards (₹7,295 etc.) with visible prev/next arrows" },
+  { "role": "footer", "note": "Nike app CTA + 'SPOTLIGHT' category icon grid + copyright/legal row" }
+]

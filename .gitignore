@@ -2,6 +2,10 @@ node_modules/
 dist/
 data/captures/
 data/assets/
+# capture.json/expected.json/baseline-scores.json ARE committed (the golden-set
+# fixtures themselves); screenshots are large, regenerable, and only needed for
+# re-labeling or the --vlm baseline, not for the harness's primary job.
+data/golden-set/*/screenshots/
 .env
 .env.local
 *.log

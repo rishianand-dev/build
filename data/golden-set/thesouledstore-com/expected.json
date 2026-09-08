@@ -1,0 +1,6 @@
+[
+  { "role": "header", "note": "ghost logo, MEN/WOMEN/SNEAKERS nav, search, account/wishlist/cart icons" },
+  { "role": "hero", "note": "MEN/WOMEN split lifestyle photo banner, no visible pagination" },
+  { "role": "banner", "note": "slim red 'HOMEGROWN INDIAN BRAND' full-width bar" },
+  { "role": "footer", "note": "NEED HELP/COMPANY/MORE INFO/STORE NEAR ME link columns + app badges + social + payment/shipping partner icons + copyright" }
+]

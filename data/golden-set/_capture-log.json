@@ -1,0 +1,132 @@
+[
+  {
+    "site": "shein.com",
+    "status": "error",
+    "detail": "page.goto: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://shein.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "site": "zara.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "hm.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "uniqlo.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "asos.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "zalando.com",
+    "status": "ok",
+    "detail": "title=\"Zalando - Shoes and Fashion Online\" nodes=93"
+  },
+  {
+    "site": "nike.com",
+    "status": "ok",
+    "detail": "title=\"Nike. Just Do It. Nike IN\" nodes=1441"
+  },
+  {
+    "site": "adidas.com",
+    "status": "blocked",
+    "detail": "DOM suspiciously small (17 nodes) — likely blocked or failed to render"
+  },
+  {
+    "site": "farfetch.com",
+    "status": "ok",
+    "detail": "title=\"FARFETCH India | The Global Destination for Modern Luxury\" nodes=345"
+  },
+  {
+    "site": "net-a-porter.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "ssense.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Just a moment...\""
+  },
+  {
+    "site": "mytheresa.com",
+    "status": "blocked",
+    "detail": "DOM suspiciously small (13 nodes) — likely blocked or failed to render"
+  },
+  {
+    "site": "revolve.com",
+    "status": "error",
+    "detail": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://revolve.com/\nCall log:\n\u001b[2m  - navigating to \"https://revolve.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "site": "nordstrom.com",
+    "status": "blocked",
+    "detail": "DOM suspiciously small (11 nodes) — likely blocked or failed to render"
+  },
+  {
+    "site": "boohoo.com",
+    "status": "ok",
+    "detail": "title=\"boohoo | Womens and Mens Clothes | Shop Online Fashion\" nodes=695"
+  },
+  {
+    "site": "next.co.uk",
+    "status": "blocked",
+    "detail": "DOM suspiciously small (13 nodes) — likely blocked or failed to render"
+  },
+  {
+    "site": "lululemon.com",
+    "status": "error",
+    "detail": "page.goto: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://lululemon.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "site": "levi.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "urbanoutfitters.com",
+    "status": "blocked",
+    "detail": "DOM suspiciously small (2 nodes) — likely blocked or failed to render"
+  },
+  {
+    "site": "gap.com",
+    "status": "ok",
+    "detail": "title=\"Gap Individual style for Women's, Men's, Baby & Kids' Clothing\" nodes=651"
+  },
+  {
+    "site": "myntra.com",
+    "status": "error",
+    "detail": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://myntra.com/\nCall log:\n\u001b[2m  - navigating to \"https://myntra.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "site": "ajio.com",
+    "status": "blocked",
+    "detail": "title suggests a bot-detection/interstitial page: \"Access Denied\""
+  },
+  {
+    "site": "tatacliq.com",
+    "status": "ok",
+    "detail": "title=\"Online Fashion & Lifestyle Shopping for Women, Men & Kids in India - Tata CLiQ\" nodes=1412"
+  },
+  {
+    "site": "nykaafashion.com",
+    "status": "error",
+    "detail": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://nykaafashion.com/\nCall log:\n\u001b[2m  - navigating to \"https://nykaafashion.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "site": "thesouledstore.com",
+    "status": "ok",
+    "detail": "title=\"Online Shopping for Men & Women Clothing, Accessories at The Souled Store\" nodes=225"
+  },
+  {
+    "site": "turtle.in",
+    "status": "ok",
+    "detail": "title=\"Shop Men's Clothing Online in India | Turtle\" nodes=1590"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  { "role": "banner", "note": "top scrolling promo bar: 'MYSTERY DISCOUNT...' / 'UP TO 20% OFF NEW SEASON' / delivery message" },
+  { "role": "header", "note": "logo, search, New In/Womens/Dresses/... nav, account/wishlist/cart icons" },
+  { "role": "hero", "note": "'workwear JUST DROPPED' full-bleed image, 'SHOP NEW SEASON' CTA, no visible pagination" },
+  { "role": "collections", "note": "'JACKETS / DRESSES / CO-ORDS' — 3 image tiles, no price" },
+  { "role": "hero", "note": "'NEW SEASON' single full-bleed lifestyle image with 'FROM £12' badge" },
+  { "role": "collections", "note": "'SHOP THE BRANDS WE LOVE' — 4 brand image tiles (DSGN.STUDIO, EGO, STEVE MADDEN, YOURS), no price" },
+  { "role": "newsletter", "note": "'Let's get to know each other' email capture with SUBSCRIBE button" },
+  { "role": "footer", "note": "Shopping/Customer Care/Privacy/Other Countries link columns + social + country + app store badges + copyright" }
+]

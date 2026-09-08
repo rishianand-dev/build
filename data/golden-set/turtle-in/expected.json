@@ -1,0 +1,13 @@
+[
+  { "role": "banner", "note": "top slim utility bar above the main header" },
+  { "role": "header", "note": "turtle logo, nav, search/account/cart icons" },
+  { "role": "hero", "note": "full-bleed store-interior lifestyle photo" },
+  { "role": "hero", "note": "'Cafe Commerce' full-bleed banner, 'EXPLORE THE COLLECTION' CTA" },
+  { "role": "collections", "note": "'Explore' — circular category icons + 8-tile lifestyle image grid, no price" },
+  { "role": "hero", "note": "'Festive Edit' full-bleed banner, 'EXPLORE THE COLLECTION' CTA" },
+  { "role": "carousel", "note": "'New for the season' — product cards (lazy-load placeholders) with visible prev/next arrows" },
+  { "role": "carousel", "note": "'Signature Bestsellers' — product cards with visible prev/next arrows" },
+  { "role": "collections", "note": "'Styled by the community' — 4 user-generated-content image tiles, no price" },
+  { "role": "newsletter", "note": "'Become a turtle Explorer' dark CTA band with signup button" },
+  { "role": "footer", "note": "turtle logo + link columns + social icons + copyright" }
+]

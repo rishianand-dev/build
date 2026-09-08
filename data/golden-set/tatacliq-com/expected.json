@@ -1,0 +1,20 @@
+[
+  { "role": "header", "note": "TATA CLiQ FASHION logo, search, account/wishlist/cart icons" },
+  { "role": "hero", "note": "'UP TO 60% OFF Homegrown festive fits' full-bleed banner, 'SHOP NOW' CTA" },
+  { "role": "collections", "note": "'Shop Drop' — circular category icon grid (Westside, footwear, handbags, gadgets, ...)" },
+  { "role": "collections", "note": "'Brand Spotlight' — 8 brand tiles (Only, Lilies, Being Human, Levi's, Polo Ralph Lauren, ...)" },
+  { "role": "collections", "note": "'Editor's Picks' — 8 category tiles (Kurtas & Suit Sets, Dresses, Mens Tees, ...)" },
+  { "role": "collections", "note": "'Her Indianwear Era' — brand tiles, discount-badge only, no price" },
+  { "role": "collections", "note": "'The Fashion Forecast' — brand tiles" },
+  { "role": "collections", "note": "'The Men's Edit' — brand tiles" },
+  { "role": "collections", "note": "'Step Into Now' — footwear brand tiles (Puma, Skechers, Metro, Guess)" },
+  { "role": "collections", "note": "'Glow Got Real' — beauty product tiles" },
+  { "role": "collections", "note": "'Base Layer' — innerwear brand tiles" },
+  { "role": "collections", "note": "'Travel Starts Here' — bag/luggage brand tiles" },
+  { "role": "collections", "note": "'Flex O'Clock' — watch brand tiles (Titan, Timex, Fossil, ...)" },
+  { "role": "collections", "note": "'Shine Stayed On' — jewelry brand tiles" },
+  { "role": "collections", "note": "'Living Levelled Up' — home decor tiles" },
+  { "role": "collections", "note": "'Tiny, Big Energy' — kidswear tiles" },
+  { "role": "collections", "note": "'The Tech Space' — tech brand tiles (Samsung, Sony, Apple, realme)" },
+  { "role": "footer", "note": "help/policy link columns + payment/social icons + copyright" }
+]

@@ -1,0 +1,6 @@
+[
+  { "role": "header", "note": "logo, Womenswear/Menswear/Kidswear nav, search, account/location icons" },
+  { "role": "collections", "note": "'Choose a department' — 3 image tiles (Womenswear/Menswear/Kidswear), no price" },
+  { "role": "newsletter", "note": "'Never miss a thing' email capture with Sign Up button" },
+  { "role": "footer", "note": "Customer Service/About FARFETCH/Discounts/Content link columns + social icons + copyright" }
+]
