@@ -324,7 +324,8 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     return pruned;
   }
 
-  const headerEl = findHeaderNode(root);
+  const headerEl = findHeaderNode(root, capture.header_behavior.probe?.box_top);
+  const headerNavEl = headerEl ? findAdjacentNavSibling(headerEl, root) : undefined;
   const footerEl = findFooterNode(root);
   const headerInnerStyle = internStyle(theme.styles, {
     pad: ["12px", "28px"],
@@ -367,15 +368,32 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
       headerPlaced = true;
       continue;
     }
+    if (headerNavEl && (child === headerNavEl || contains(child, headerNavEl))) {
+      continue;
+    }
     if (!headerPlaced && child.box.height <= 72 && child.box.width > 600) {
       topChrome.push(...buildBlock(child, ctx));
       continue;
     }
     body.push(...buildBlock(child, ctx));
   }
-  const headerBits = headerEl
+  const headerSearchScope: DomNode | undefined =
+    headerEl && headerNavEl
+      ? {
+          ...headerEl,
+          // headerLinks() bounds candidate anchors by `header.box.y + header.box.height` —
+          // extend the box to cover the merged nav sibling too, or its links
+          // (which sit below the original pinned-bar's box) get filtered out.
+          box: {
+            ...headerEl.box,
+            height: headerNavEl.box.y + headerNavEl.box.height - headerEl.box.y,
+          },
+          children: [...headerEl.children, headerNavEl],
+        }
+      : headerEl;
+  const headerBits = headerSearchScope
     ? buildHeader(
-        headerEl,
+        headerSearchScope,
         theme,
         headerStyle,
         headerInnerStyle,
@@ -452,7 +470,7 @@ interface BuildCtx {
   visionCandidates: Array<{ node: Node; box?: Box; reason: string }>;
 }
 
-function findHeaderNode(root: DomNode): DomNode | undefined {
+function findHeaderNode(root: DomNode, probeBox?: Box | null): DomNode | undefined {
   const tagged = findOne(root, (n) => n.tag === "header" || n.role === "banner");
   if (tagged) return tagged;
   const named = findAll(
@@ -464,7 +482,80 @@ function findHeaderNode(root: DomNode): DomNode | undefined {
       n.box.height <= 280 &&
       n.box.width >= 400,
   );
-  return named.sort((a, b) => a.box.y - b.box.y || b.box.width - a.box.width)[0];
+  const byName = named.sort((a, b) => a.box.y - b.box.y || b.box.width - a.box.width)[0];
+  if (byName) return byName;
+
+  // Fall back to the capture-time header probe (in-page.ts's findHeader,
+  // run live in the browser during capturePage): it identifies the header
+  // by computed CSS position (sticky/fixed) and top-of-page geometry, not
+  // by guessing from a className substring. Real sites increasingly use
+  // CSS-in-JS with hashed classnames (e.g. "css-1sqetoh") that give the
+  // className search nothing to match even though the header is right
+  // there — this recovers it via the exact box the capture already found,
+  // by locating the DOM node in this (offline) tree closest to that box.
+  if (probeBox) return findNodeByBox(root, probeBox);
+  return undefined;
+}
+
+function findNodeByBox(root: DomNode, box: Box): DomNode | undefined {
+  let best: DomNode | undefined;
+  let bestDelta = Infinity;
+  walk(root, (n) => {
+    const delta =
+      Math.abs(n.box.x - box.x) +
+      Math.abs(n.box.y - box.y) +
+      Math.abs(n.box.width - box.width) +
+      Math.abs(n.box.height - box.height);
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      best = n;
+    }
+  });
+  // Generous-but-bounded: the probe and the DOM snapshot are taken moments
+  // apart in the same page load, so a real match should be near-exact:
+  // allow a few px of drift summed across all four dimensions, not an
+  // unbounded "closest node in the whole document" fallback.
+  return bestDelta <= 20 ? best : undefined;
+}
+
+/**
+ * The capture-time sticky/fixed probe (findNodeByBox above) finds whichever
+ * single element is actually `position: sticky`/`fixed` — often just the
+ * logo+utility-icons bar, not the full visual header. Real sites frequently
+ * split "logo + account/cart" (pinned) from "the main nav menu" (a sibling
+ * `<nav>`/`role=region` row immediately below it that scrolls normally, or
+ * hides on scroll-down). Rather than only ever seeing the pinned sliver,
+ * check whether the very next sibling looks like the rest of the header —
+ * adjacent, header-height, and nav-shaped (a `nav` tag/role, or several
+ * short links) — and if so, treat it as part of the header's search scope
+ * too, not a separate unrelated body block.
+ */
+function findAdjacentNavSibling(headerEl: DomNode, root: DomNode): DomNode | undefined {
+  let parent: DomNode | undefined;
+  walk(root, (n) => {
+    if (!parent && n.children.includes(headerEl)) parent = n;
+  });
+  if (!parent) return undefined;
+  // Use visibleKids, not the raw children array: a hidden mega-menu/dropdown
+  // panel can sit between the header and the real nav row in document order
+  // (zero-opacity or display:none, but still present with a large box) —
+  // the *next visible* sibling is what actually renders right after it.
+  const kids = visibleKids(parent);
+  const idx = kids.indexOf(headerEl);
+  const next = idx >= 0 ? kids[idx + 1] : undefined;
+  if (!next) return undefined;
+
+  const gap = next.box.y - (headerEl.box.y + headerEl.box.height);
+  if (gap < -10 || gap > 40) return undefined;
+  if (next.box.height > 120 || next.box.width < headerEl.box.width * 0.5) return undefined;
+
+  const looksNav =
+    next.tag === "nav" ||
+    next.role === "navigation" ||
+    next.role === "region" ||
+    /nav/.test(nameOf(next)) ||
+    findAll(next, (n) => n.tag === "a" && Boolean(n.href)).length >= 2;
+  return looksNav ? next : undefined;
 }
 
 function findFooterNode(root: DomNode): DomNode | undefined {
@@ -708,14 +799,17 @@ function isWrapper(node: DomNode, kids: DomNode[]): boolean {
  * Descends through single-child wrapper divs (e.g. a framework's `#__next`/
  * `#root` mount node wrapping header+main+footer in one pass-through div)
  * before themeFromCapture's top-level loop reads `root.children`. That loop
- * assumes root.children are roughly flat top-level sections (header, a few
- * content blocks, footer) and skips any child that *contains* the detected
- * footer element — correct for a flat `<body><header/><main/><footer/></body>`,
- * but wrong when a real SPA nests all three under one wrapper: without this,
- * the one wrapper child "contains the footer" and the whole page — header,
- * every content section, all of it — gets silently dropped, not just the
- * footer. `body`/`main` tags always match `isWrapper`, so this always at
- * least evaluates body's own single real child, not just a no-op.
+ * assumes root.children are roughly flat top-level sections (header, a
+ * promo bar, a nav sibling, a few content blocks, footer) — without this,
+ * a real SPA's single wrapper child is the *only* thing the loop ever sees,
+ * so its per-child special-casing (the topChrome promo-bar carve-out, and
+ * crucially the `headerNavEl` skip below) never gets a chance to run.
+ * `ctx.headerEl`/`ctx.footerEl` in buildBlock (see its own top line) is a
+ * second, complementary guard against re-processing the header/footer
+ * themselves at *any* recursion depth, but it doesn't know about
+ * `headerNavEl` — this is what keeps that in sync with what the loop
+ * actually iterates. `body`/`main` tags always match `isWrapper`, so this
+ * always at least evaluates body's own single real child, not just a no-op.
  */
 function unwrapBodyRoot(node: DomNode): DomNode {
   let current = node;

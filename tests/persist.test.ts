@@ -49,12 +49,22 @@ function el(partial: Partial<DomNode> & { tag: string }): DomNode {
   };
 }
 
-function featureSection(title: string, copy: string): DomNode {
+// A titled thumbnail strip (extractTiles' "collections" path, matched well
+// before buildBlock's kids-recursion fallback, so it isn't sensitive to
+// that heuristic's title-vs-recurse ordering). nodeWeight doesn't count a
+// `list` node's items (ListNode has no `children`), so the title text node
+// is what pushes weight to promoteRepeats' minWeight of 3 (stack + title +
+// list); without it, three visually-identical-but-title-less strips are
+// each one node too light to qualify for promotion.
+function thumbStrip(prefix: string): DomNode {
   return el({
     tag: "section",
+    box: { x: 0, y: 0, width: 1200, height: 140 },
     children: [
-      el({ tag: "h3", text: title }),
-      el({ tag: "p", text: copy }),
+      el({ tag: "h2", text: "SHOP BY CATEGORY", box: { x: 0, y: 0, width: 1200, height: 32 } }),
+      el({ tag: "img", src: `https://example.test/${prefix}-1.jpg`, box: { x: 0, y: 32, width: 100, height: 100 } }),
+      el({ tag: "img", src: `https://example.test/${prefix}-2.jpg`, box: { x: 120, y: 32, width: 100, height: 100 } }),
+      el({ tag: "img", src: `https://example.test/${prefix}-3.jpg`, box: { x: 240, y: 32, width: 100, height: 100 } }),
     ],
   });
 }
@@ -94,11 +104,7 @@ describe("persistBuild", () => {
       warnings: [],
       dom: el({
         tag: "body",
-        children: [
-          featureSection("Free shipping", "Every order ships free within three business days."),
-          featureSection("Easy returns", "Return any item within thirty days for a full refund."),
-          featureSection("Secure checkout", "Your payment details are encrypted end to end always."),
-        ],
+        children: [thumbStrip("a"), thumbStrip("b"), thumbStrip("c")],
       }),
     };
 
@@ -109,9 +115,9 @@ describe("persistBuild", () => {
     expect(onDisk).toEqual(theme);
 
     // All three top-level children are identically-shaped (structure-only
-    // fingerprint ignores actual text), so compactTheme's promoteRepeats
-    // lifts them into one component and collapseInstanceLists then
-    // collapses the resulting 3 same-component instances into a single
+    // fingerprint ignores actual text/asset identity), so compactTheme's
+    // promoteRepeats lifts them into one component and collapseInstanceLists
+    // then collapses the resulting 3 same-component instances into a single
     // `list` node in place of the page root's `stack`.
     const root = theme.pages[0]!.root;
     if (root.type !== "list") throw new Error(`expected root to collapse into a list node, got ${root.type}`);

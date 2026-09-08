@@ -34,6 +34,11 @@ const TOKEN_GROUPS: TokenGroup[] = [
  */
 const ALWAYS_KEEP_EMPTY = new Set<string>(["site", "tokens", "styles", "assets", "components", ...TOKEN_GROUPS]);
 
+/** Same reasoning as ALWAYS_KEEP_EMPTY above, for ThemeDoc's non-optional array fields
+ * (`pages`/`children` were already exempted; `review` is equally non-optional — code
+ * like `theme.review.push(...)` must not find it missing just because it's empty). */
+const ALWAYS_KEEP_EMPTY_ARRAY = new Set<string>(["pages", "children", "review"]);
+
 export function prune(value: unknown): unknown {
   if (value === undefined || value === null) return undefined;
   if (Array.isArray(value)) {
@@ -53,7 +58,7 @@ export function prune(value: unknown): unknown {
       ) {
         continue;
       }
-      if (Array.isArray(next) && next.length === 0 && key !== "pages" && key !== "children") {
+      if (Array.isArray(next) && next.length === 0 && !ALWAYS_KEEP_EMPTY_ARRAY.has(key)) {
         continue;
       }
       out[key] = next;

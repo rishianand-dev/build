@@ -155,7 +155,11 @@ describe("themeFromCapture: SPA root-wrapper unwrapping", () => {
             tag: "section",
             box: { x: 0, y: 0, width: 1440, height: 300 },
             children: [
-              el({ tag: "h2", text: "Only section" }),
+              // A heading with no children of its own only ever surfaces via
+              // buildBlock's own-text "copy" fallback (a bare h1-h6 tag never
+              // matches sectionTitle()'s "descendant heading" search on
+              // itself) — needs >12 chars to clear that filter's threshold.
+              el({ tag: "h2", text: "Only section on this page" }),
               el({ tag: "p", text: "Just one section directly under body, nothing to unwrap here." }),
             ],
           }),
@@ -165,6 +169,7 @@ describe("themeFromCapture: SPA root-wrapper unwrapping", () => {
 
     const theme = themeFromCapture(capture);
     const html = renderThemeHtml(theme);
-    expect(html).toContain("Only section");
+    expect(html).toContain("Only section on this page");
+    expect(html).toContain("Just one section directly under body");
   });
 });
