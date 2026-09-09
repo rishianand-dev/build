@@ -16,12 +16,13 @@
         "pattern": "hero"
       }
     ],
-    "confidence": 0.55,
-    "hits": 1,
+    "confidence": 0.6625000000000001,
+    "hits": 2,
     "source": "pixel-loop+vision",
     "learnedAt": "2026-09-09T11:43:51.284Z",
     "examples": [
-      "div.d-flex — \"Real region looks like a card (Language selection card for the Indian Space Research Organisation website, offering Hindi and English options.); rendered as footer (A cropped section of a footer with links to ISRO portals and programs.).\""
+      "div.d-flex — \"Real region looks like a card (Language selection card for the Indian Space Research Organisation website, offering Hindi and English options.); rendered as footer (A cropped section of a footer with links to ISRO portals and programs.).\"",
+      "div.d-flex — \"Real region looks like a card (A language selection card for the Indian Space Research Organisation, offering options in Hindi and English.); rendered as header (A cropped section of a webpage header showing a space rocket on a launch pad with navigation links and a search icon.).\""
     ]
   },
   {
@@ -41,12 +42,13 @@
         "pattern": "chefs"
       }
     ],
-    "confidence": 0.55,
-    "hits": 1,
+    "confidence": 0.6625000000000001,
+    "hits": 2,
     "source": "pixel-loop+vision",
     "learnedAt": "2026-09-09T11:44:21.816Z",
     "examples": [
-      "div.chefs — \"Real region looks like a carousel (A carousel of images showing the launch of a rocket, from preparation to liftoff.); rendered as tile (A cropped section of a web page showing mission details for various space missions, including GSLV-F17/EOS-05, PSLV-C62/EOS-N1, LVM3-M6/BlueBird Block-2, and LVM3-M5/CMS-03.).\""
+      "div.chefs — \"Real region looks like a carousel (A carousel of images showing the launch of a rocket, from preparation to liftoff.); rendered as tile (A cropped section of a web page showing mission details for various space missions, including GSLV-F17/EOS-05, PSLV-C62/EOS-N1, LVM3-M6/BlueBird Block-2, and LVM3-M5/CMS-03.).\"",
+      "div.chefs — \"Real region looks like a carousel (A carousel of images showing the launch of a rocket, from preparation to liftoff.); the rendered region is blank.\""
     ]
   },
   {
@@ -89,6 +91,23 @@
     "learnedAt": "2026-09-09T11:44:57.592Z",
     "examples": [
       "header.d-flex — \"Real region looks like a footer (A cropped section of a footer with navigation links and social media icons.); rendered as header (A cropped section of a header with navigation links and a logo for 'ISRO DOS Banner'.).\""
+    ]
+  },
+  {
+    "id": "lp-mtu31ixk-8wu1",
+    "role": "footer",
+    "matchers": [
+      {
+        "kind": "id",
+        "pattern": "main"
+      }
+    ],
+    "confidence": 0.55,
+    "hits": 1,
+    "source": "pixel-loop+vision",
+    "learnedAt": "2026-09-09T12:36:33.176Z",
+    "examples": [
+      "main — \"Real region looks like a footer (A section of a webpage with links and contact information for ISRO, including addresses, phone numbers, and email. It also includes various links to reports, policies, and other resources.); rendered as card (A cropped section of a web page showing mission details for space missions, including GSLV-F17/EOS-05, PSLV-C62/EOS-N1, LVM3-M6/BlueBird Block-2, and LVM3-M5/CMS-03. Each mission has a clickable link ).\""
     ]
   }
 ]

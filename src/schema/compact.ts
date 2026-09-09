@@ -229,6 +229,25 @@ function nodeWeight(node: Node): number {
   return n;
 }
 
+/**
+ * `list` nodes carry their real per-item content in `items`, which
+ * `fingerprint()` deliberately excludes (so a list's shape reads the same
+ * regardless of what's in it) and `collectBinds()` doesn't know how to
+ * extract per-instance (it only bind-izes text/image/link/button). A
+ * promoted component containing a `list` would freeze whichever occurrence
+ * got promoted first's `items` into the shared component root, silently
+ * reusing that one section's real content for every other section that
+ * happens to share the same wrapper style/shape (a real, observed
+ * collision: two different tile sections using the same section/list
+ * style land on an identical fingerprint despite completely different
+ * items). Never promote a subtree that contains one.
+ */
+function containsList(node: Node): boolean {
+  if (node.type === "list") return true;
+  if ("children" in node) return node.children.some(containsList);
+  return false;
+}
+
 /** Fingerprint ignores instance-specific content so repeated cards hash equal. */
 export function fingerprint(node: Node): string {
   const style = node.style ?? "";
@@ -318,7 +337,7 @@ export function promoteRepeats(theme: ThemeDoc, options: PromoteOptions = {}): T
 
   for (const page of theme.pages) {
     walkNodes(page.root, (node) => {
-      if (node.type === "instance" || node.type === "list") return;
+      if (node.type === "instance" || node.type === "list" || containsList(node)) return;
       if (nodeWeight(node) < minWeight) return;
       const fp = fingerprint(node);
       counts.set(fp, (counts.get(fp) ?? 0) + 1);
@@ -326,7 +345,7 @@ export function promoteRepeats(theme: ThemeDoc, options: PromoteOptions = {}): T
   }
   for (const comp of Object.values(theme.components)) {
     walkNodes(comp.root, (node) => {
-      if (node.type === "instance" || node.type === "list") return;
+      if (node.type === "instance" || node.type === "list" || containsList(node)) return;
       if (nodeWeight(node) < minWeight) return;
       const fp = fingerprint(node);
       counts.set(fp, (counts.get(fp) ?? 0) + 1);
@@ -341,6 +360,7 @@ export function promoteRepeats(theme: ThemeDoc, options: PromoteOptions = {}): T
     const eligible =
       node.type !== "instance" &&
       node.type !== "list" &&
+      !containsList(node) &&
       nodeWeight(node) >= minWeight &&
       (counts.get(fp) ?? 0) >= minCount;
 

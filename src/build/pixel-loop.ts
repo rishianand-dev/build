@@ -30,6 +30,7 @@ import { deriveMatchers, saveLearnedPattern, type Matcher } from "./learned-patt
 import { describeDiff, type DiffDescription } from "./vision-diff.js";
 import { ollamaReachable } from "./ollama.js";
 import { insertChildAtPath, mergeSubtreeIntoTheme, replaceNodeAtPath } from "./merge-subtree.js";
+import { ASSETS_ROOT } from "./rehost-assets.js";
 import { resolveNodeAtPath, stringifyTheme } from "../schema/compact.js";
 import type { Node, ThemeDoc } from "../schema/theme.js";
 import type { DomNode, PageCapture } from "../types/page-capture.js";
@@ -149,6 +150,79 @@ interface TaggedBox {
   height: number;
 }
 
+/** A synthetic origin for `renderIntoPage`'s document route — any URL works,
+ * as long as it's the same one this loop's own routes are registered
+ * against and the one it navigates to each iteration. */
+const PIXEL_MATCH_ORIGIN = "http://pixel-match.local/";
+
+/**
+ * `page.setContent(html)` leaves the document at `about:blank`, which has
+ * no valid origin to resolve a root-relative URL against — a rehosted
+ * asset reference like `src="/api/assets/<hash>.webm"` (what
+ * `renderThemeHtml` emits; there's no running app server in this loop to
+ * point an `assetBase` at instead) never even reaches the network layer,
+ * confirmed by instrumenting Playwright's own request events: zero
+ * requests fire for it. Every image/video across the whole rendered page
+ * is therefore invisible in every iteration's screenshot regardless of how
+ * correctly it was classified — routing the page through a real (synthetic)
+ * origin and serving `/api/assets/*` from the local content-addressed
+ * store fixes that.
+ */
+async function installAssetRouting(page: Page): Promise<void> {
+  await page.route("**/api/assets/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    const filename = pathname.replace(/^\/api\/assets\//, "");
+    if (!filename || filename.includes("/") || filename.includes("..")) {
+      await route.fulfill({ status: 404, body: "" });
+      return;
+    }
+    try {
+      await route.fulfill({ path: join(ASSETS_ROOT, filename) });
+    } catch {
+      await route.fulfill({ status: 404, body: "" });
+    }
+  });
+}
+
+/** Serves `html` as the document at PIXEL_MATCH_ORIGIN, so relative asset
+ * URLs resolve against a real origin instead of `about:blank`. */
+async function renderIntoPage(page: Page, html: string): Promise<void> {
+  await page.unroute(PIXEL_MATCH_ORIGIN).catch(() => undefined);
+  await page.route(PIXEL_MATCH_ORIGIN, (route) =>
+    route.fulfill({ status: 200, contentType: "text/html", body: html }),
+  );
+  await page.goto(PIXEL_MATCH_ORIGIN, { waitUntil: "load", timeout: 30_000 });
+}
+
+/**
+ * An autoplaying <video> (e.g. a hero background) hasn't painted a frame
+ * the instant `page.setContent` resolves — a screenshot taken immediately
+ * after shows only the page background behind it. Wait for each video to
+ * reach a paintable frame (readyState >= HAVE_CURRENT_DATA), capped so a
+ * video that never loads (offline capture, broken asset) can't hang the
+ * loop indefinitely.
+ */
+async function waitForVideoFrames(page: Page, timeoutMs = 4000): Promise<void> {
+  await page
+    .$$eval(
+      "video",
+      (vids, timeout) =>
+        Promise.all(
+          vids.map((v) =>
+            v.readyState >= 2
+              ? undefined
+              : new Promise<void>((resolve) => {
+                  const done = () => resolve();
+                  v.addEventListener("loadeddata", done, { once: true });
+                  setTimeout(done, timeout);
+                }),
+          ),
+        ),
+      timeoutMs,
+    )
+    .catch(() => undefined);
+}
+
 async function collectTaggedBoxes(page: Page): Promise<TaggedBox[]> {
   return page.$$eval("[data-tp]", (els) =>
     els.map((el) => {
@@ -198,6 +272,7 @@ export async function runPixelMatchLoop(
   try {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage({ viewport: capture.viewport });
+    await installAssetRouting(page);
 
     // Snapshot of `theme` from immediately before the most recent patch was
     // applied, so a patch that turns out to have made things worse (real,
@@ -219,8 +294,9 @@ export async function runPixelMatchLoop(
       const html = renderThemeHtml(theme, "home", { pages: "all", tagPaths: true });
       await writeFile(join(iterDir, "page.html"), html, "utf8");
 
-      await page.setContent(html, { waitUntil: "load", timeout: 30_000 });
+      await renderIntoPage(page, html);
       await page.evaluate(() => window.scrollTo(0, 0));
+      await waitForVideoFrames(page);
       const boxes = await collectTaggedBoxes(page);
 
       const screenshotAbsPath = join(iterDir, "screenshot.png");

@@ -62,6 +62,22 @@ async function fileExists(path: string): Promise<boolean> {
   }
 }
 
+/**
+ * A URL captured from a live page is not guaranteed absolute — e.g. an
+ * `<img srcset>` candidate reflects its attribute text verbatim, unresolved,
+ * unlike `.src`/`.currentSrc` — so a root-relative asset URL can still slip
+ * through to here. Resolve it against the theme's source page instead of
+ * silently declining to rehost it.
+ */
+function resolveAssetUrl(url: string, base: string | undefined): string {
+  if (/^https?:\/\//i.test(url) || !base) return url;
+  try {
+    return new URL(url, base).href;
+  } catch {
+    return url;
+  }
+}
+
 /** Downloads one URL, writes it into the content-addressed store, and returns its served path. Returns null on any failure or when the URL isn't remote. */
 export async function rehostOne(url: string): Promise<string | null> {
   if (!/^https?:\/\//i.test(url)) return null;
@@ -105,8 +121,9 @@ export async function rehostThemeAssets(theme: ThemeDoc): Promise<ThemeDoc> {
   const assets = theme.assets ?? {};
   const entries = Object.entries(assets);
   if (!entries.length) return theme;
+  const base = theme.site.source;
   await mapLimit(entries, CONCURRENCY, async ([id, asset]) => {
-    const hosted = await rehostOne(asset.url);
+    const hosted = await rehostOne(resolveAssetUrl(asset.url, base));
     if (hosted) assets[id] = { ...asset, url: hosted };
   });
   theme.assets = assets;

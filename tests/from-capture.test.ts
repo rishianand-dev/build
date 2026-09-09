@@ -1208,6 +1208,140 @@ describe("themeFromCapture", () => {
     expect(html).toContain("https://cdn.example/hero-0.jpg");
     expect(html).toContain("https://cdn.example/deal-2.jpg");
   });
+
+  it("keeps distinct dropdown nav items that share one placeholder href", () => {
+    const navLink = (label: string, href = "https://shop.example/#") =>
+      el({
+        tag: "a",
+        href,
+        box: { x: 0, y: 0, width: 90, height: 40 },
+        children: [el({ tag: "span", text: label })],
+      });
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 900 },
+            children: [
+              el({
+                tag: "header",
+                box: { x: 0, y: 0, width: 1440, height: 64 },
+                children: [
+                  navLink("Home", "https://shop.example/"),
+                  navLink("About"),
+                  navLink("Activities"),
+                  navLink("Programmes"),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("About");
+    expect(html).toContain("Activities");
+    expect(html).toContain("Programmes");
+  });
+
+  it("falls back to a text brand instead of squashing a wide decorative banner into the logo slot", () => {
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 900 },
+            children: [
+              el({
+                tag: "header",
+                box: { x: 0, y: 0, width: 1440, height: 140 },
+                children: [
+                  el({
+                    tag: "img",
+                    src: "https://cdn.example/banner.jpg",
+                    alt: "Site Banner",
+                    box: { x: 0, y: 0, width: 1296, height: 102 },
+                  }),
+                  el({ tag: "span", text: "Home" }),
+                ],
+              }),
+              el({
+                tag: "main",
+                box: { x: 0, y: 140, width: 1440, height: 400 },
+                children: [el({ tag: "h1", text: "Welcome" })],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).not.toContain("https://cdn.example/banner.jpg");
+    expect(html).toContain("Fixture Store");
+  });
+
+  it("joins every qualifying text node in a bar/ticker instead of keeping only the first", () => {
+    const html = renderThemeHtml(
+      themeFromCapture(
+        sample(
+          el({
+            tag: "body",
+            box: { x: 0, y: 0, width: 1440, height: 900 },
+            children: [
+              el({ tag: "header", children: [el({ tag: "span", text: "Home" })] }),
+              el({
+                tag: "div",
+                className: "ticker",
+                box: { x: 0, y: 64, width: 1440, height: 40 },
+                children: [
+                  el({ tag: "b", text: "Flash News:" }),
+                  el({ tag: "span", text: "ISRO launches Bharatiya Antariksh Hackathon 2026" }),
+                ],
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(html).toContain("Flash News:");
+    expect(html).toContain("ISRO launches Bharatiya Antariksh Hackathon 2026");
+  });
+
+  it("groups a repeatable icon-link row using sub-72px icons into one list, not one section per icon", () => {
+    const iconTile = (label: string) =>
+      el({
+        tag: "a",
+        href: `https://shop.example/${label.toLowerCase()}`,
+        box: { x: 0, y: 0, width: 159, height: 102 },
+        children: [
+          el({ tag: "img", src: `https://cdn.example/${label.toLowerCase()}.png`, box: { x: 0, y: 0, width: 60, height: 60 } }),
+          el({ tag: "span", text: label }),
+        ],
+      });
+    const theme = themeFromCapture(
+      sample(
+        el({
+          tag: "body",
+          box: { x: 0, y: 0, width: 1440, height: 900 },
+          children: [
+            el({ tag: "header", children: [el({ tag: "span", text: "Home" })] }),
+            el({
+              tag: "div",
+              className: "why-us",
+              box: { x: 0, y: 100, width: 1440, height: 163 },
+              children: ["Grants", "STEM", "SPARK", "MOSDAC", "ISSDC", "GeoPlatform", "VEDAS", "NDEM"].map(iconTile),
+            }),
+          ],
+        }),
+      ),
+    );
+    const root = theme.pages[0]?.root;
+    const topLevel = root && "children" in root ? root.children : [];
+    // One header + one grouped list, not one header + eight separate sections.
+    expect(topLevel.length).toBeLessThan(4);
+    const html = renderThemeHtml(theme);
+    expect(html).toContain("STEM");
+    expect(html).toContain("NDEM");
+  });
 });
 
 describe("connected page helpers", () => {

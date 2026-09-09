@@ -1,5 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { rm } from "node:fs/promises";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { themeFromCapture } from "../src/build/from-capture.js";
 import {
   LEARNED_PATTERNS_PATH,
@@ -83,6 +84,23 @@ async function reset() {
 }
 
 describe("learned patterns actually change themeFromCapture's classification", () => {
+  // LEARNED_PATTERNS_PATH is the real, git-tracked data/learned-patterns.json
+  // (not a per-test temp path) — back it up and restore it around the suite
+  // so exercising these tests doesn't leave the real file deleted/clobbered.
+  let backup: string | null = null;
+  beforeAll(async () => {
+    backup = await readFile(LEARNED_PATTERNS_PATH, "utf8").catch(() => null);
+  });
+  afterAll(async () => {
+    if (backup !== null) {
+      await mkdir(dirname(LEARNED_PATTERNS_PATH), { recursive: true });
+      await writeFile(LEARNED_PATTERNS_PATH, backup, "utf8");
+    } else {
+      await rm(LEARNED_PATTERNS_PATH, { force: true });
+    }
+    invalidateLearnedPatternsCache();
+  });
+
   beforeEach(reset);
   afterEach(reset);
 

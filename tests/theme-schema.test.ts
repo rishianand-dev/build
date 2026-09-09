@@ -154,6 +154,43 @@ describe("promoteRepeats + list collapse", () => {
     expect(json.length).toBeLessThan(bloatedSize * 0.85);
   });
 
+  it("never promotes a section containing a list node, even when two sections share the exact same shape", () => {
+    // Two top-level sections, identical in structure (same styles, same
+    // wrapper shape) but with different list items — fingerprint() ignores
+    // a list's `items` entirely, so these look identical to promoteRepeats.
+    // collectBinds() has no case for `type: "list"`, so promoting either
+    // one would freeze its items into the shared component and the other
+    // section would silently render the first one's (wrong) content.
+    const section = (items: Array<{ img: string; t1: string }>): Node => ({
+      type: "stack",
+      style: "card",
+      children: [
+        { type: "text", tag: "h2", text: "Section", style: "h3" },
+        { type: "list", of: "collection", style: "row", items },
+      ],
+    });
+    const theme = emptyTheme({
+      pages: [
+        {
+          id: "home",
+          path: "/",
+          root: {
+            type: "stack",
+            children: [
+              section([{ img: "a1", t1: "One" }]),
+              section([{ img: "a2", t1: "Two" }]),
+            ],
+          },
+        },
+      ],
+    });
+    const after = promoteRepeats(theme, { minCount: 2, minWeight: 3 });
+    expect(Object.keys(after.components)).toHaveLength(0);
+    const root = after.pages[0]!.root;
+    if (!("children" in root)) throw new Error("expected root to have children");
+    expect(root.children.every((c) => c.type === "stack")).toBe(true);
+  });
+
   it("keeps unique header structure inline instead of forcing a component", () => {
     const after = promoteRepeats(bloatedStore(), { minCount: 2, minWeight: 3 });
     const header = after.pages[0]!.root;

@@ -70,7 +70,7 @@ function thumbStrip(prefix: string): DomNode {
 }
 
 describe("persistBuild", () => {
-  it("promotes repeated non-card sections into a shared component via compactTheme", async () => {
+  it("never merges list-bearing sections into a shared component, even when identically shaped", async () => {
     const capture: PageCapture = {
       schema_version: "1.0",
       url: "https://example.test/",
@@ -114,15 +114,28 @@ describe("persistBuild", () => {
     const onDisk = JSON.parse(await readFile(join(outDir, "theme.json"), "utf8")) as ThemeDoc;
     expect(onDisk).toEqual(theme);
 
-    // All three top-level children are identically-shaped (structure-only
-    // fingerprint ignores actual text/asset identity), so compactTheme's
-    // promoteRepeats lifts them into one component and collapseInstanceLists
-    // then collapses the resulting 3 same-component instances into a single
-    // `list` node in place of the page root's `stack`.
+    // All three top-level sections are identically *shaped* (structure-only
+    // fingerprint ignores actual asset identity) but hold genuinely
+    // different images. compactTheme's promoteRepeats must not lift a
+    // list-bearing section into a shared component: collectBinds() has no
+    // case for `type: "list"`, so a promoted list's `items` would freeze
+    // onto whichever section got promoted first, and every other section
+    // sharing that shape would silently render the same (wrong) images —
+    // real, observed data loss. Each section must stay distinct.
     const root = theme.pages[0]!.root;
-    if (root.type !== "list") throw new Error(`expected root to collapse into a list node, got ${root.type}`);
-    expect(root.items.length).toBe(3);
-    expect(theme.components[root.of]).toBeTruthy();
-    expect(theme.pages[0]!.root.type).not.toBe("stack");
+    if (!("children" in root)) throw new Error(`expected root to have children, got ${root.type}`);
+    expect(root.children).toHaveLength(3);
+    expect(root.children.every((c) => c.type === "stack")).toBe(true);
+
+    const imageUrlsFor = (section: (typeof root.children)[number]): string[] => {
+      if (!("children" in section)) return [];
+      const list = section.children.find((c) => c.type === "list");
+      if (!list || list.type !== "list") return [];
+      return list.items.map((item) => theme.assets[item.img as string]?.url ?? "");
+    };
+    const [a, b, c] = root.children.map(imageUrlsFor);
+    expect(a).toEqual(["https://example.test/a-1.jpg", "https://example.test/a-2.jpg", "https://example.test/a-3.jpg"]);
+    expect(b).toEqual(["https://example.test/b-1.jpg", "https://example.test/b-2.jpg", "https://example.test/b-3.jpg"]);
+    expect(c).toEqual(["https://example.test/c-1.jpg", "https://example.test/c-2.jpg", "https://example.test/c-3.jpg"]);
   });
 });

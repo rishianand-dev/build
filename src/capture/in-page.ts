@@ -218,6 +218,29 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
     return out;
   }
 
+  // Unlike `.src`/`.currentSrc` (browser-resolved, always absolute), the
+  // `.srcset` IDL getter reflects the raw attribute text verbatim — a
+  // root-relative candidate (e.g. "/media/x.jpg 1024w") stays root-relative.
+  // pickImageUrl() downstream prefers the highest-width srcset candidate
+  // over `.src`, so a relative URL here silently defeats asset rehosting.
+  const resolveSrcset = (raw: string): string =>
+    raw
+      .split(",")
+      .map((part) => {
+        const trimmed = part.trim();
+        if (!trimmed) return trimmed;
+        const spaceIdx = trimmed.search(/\s/);
+        const url = spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx);
+        const descriptor = spaceIdx === -1 ? "" : trimmed.slice(spaceIdx);
+        try {
+          return `${new URL(url, location.href).href}${descriptor}`;
+        } catch {
+          return trimmed;
+        }
+      })
+      .filter(Boolean)
+      .join(", ");
+
   const collectDom = (maxNodes: number): DomNode | null => {
     let count = 0;
     const walk = (el: Element): DomNode | null => {
@@ -243,7 +266,7 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
       if (el instanceof HTMLAnchorElement && el.href) node.href = el.href;
       if (el instanceof HTMLImageElement) {
         node.src = el.currentSrc || el.src;
-        node.srcset = el.srcset || undefined;
+        node.srcset = el.srcset ? resolveSrcset(el.srcset) : undefined;
         node.alt = el.alt;
       }
       if (el instanceof HTMLVideoElement) {

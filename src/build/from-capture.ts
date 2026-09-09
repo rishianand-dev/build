@@ -195,7 +195,8 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
   });
   const logoStyle = internStyle(theme.styles, { height: "40px" });
   const heroH = capture.dom
-    ? findAll(capture.dom, (n) => n.tag === "img" && n.box.width >= 900 && n.box.height >= 220)[0]?.box.height
+    ? findAll(capture.dom, (n) => (n.tag === "img" || n.tag === "video") && n.box.width >= 900 && n.box.height >= 220)[0]
+        ?.box.height
     : undefined;
   const heroStyle = internStyle(theme.styles, {
     width: "100%",
@@ -632,8 +633,8 @@ function internImg(theme: ThemeDoc, node: DomNode): string | null {
 }
 
 function barLabel(node: DomNode): string {
-  const labels = texts(node).filter((t) => t.length >= 6 && t.length <= 80 && !/^https?:/i.test(t));
-  return (labels[0] ?? "").slice(0, 90);
+  const labels = [...new Set(texts(node).filter((t) => t.length >= 6 && t.length <= 80 && !/^https?:/i.test(t)))];
+  return labels.join(" ").slice(0, 90);
 }
 
 function internBarStyle(theme: ThemeDoc, node: DomNode, fallback: string): string {
@@ -674,13 +675,19 @@ function similarBox(a: DomNode, b: DomNode): boolean {
   return dw < 0.35 && dh < 0.45;
 }
 
+// 40px matches the floor already used for the header logo candidate filter
+// (from-capture.ts's buildHeader) — small enough to catch a real icon-link
+// row (e.g. a 60px program/partner icon grid), not so small it picks up
+// tracking pixels or decorative glyphs.
+const MEDIA_MIN_WIDTH = 40;
+
 function hasMedia(node: DomNode): boolean {
   return Boolean(
     findOne(
       node,
       (n) =>
-        (n.tag === "img" && Boolean(n.src) && n.box.width >= 72) ||
-        (n.tag === "video" && n.box.width >= 72),
+        (n.tag === "img" && Boolean(n.src) && n.box.width >= MEDIA_MIN_WIDTH) ||
+        (n.tag === "video" && n.box.width >= MEDIA_MIN_WIDTH),
     ),
   );
 }
@@ -789,6 +796,10 @@ function isModalOverlay(node: DomNode): boolean {
   const pos = node.style.position;
   if (pos !== "fixed" && pos !== "absolute") return false;
   if (node.box.width < 640 || node.box.height < 320) return false;
+  // Text-keyword matching alone misses a modal whose copy isn't one of the
+  // known phrasings (e.g. a language-selector popup) but whose own
+  // id/class already says what it is — a real, observed shape.
+  if (/popup|modal|dialog|overlay/.test(nameOf(node))) return true;
   const t = deepText(node).toLowerCase();
   return /log in|sign in|enter your phone|cookie|accept all|above 18|verify (your )?age/.test(t);
 }
@@ -1145,7 +1156,7 @@ function viewAllLink(node: DomNode): Node | null {
 
 function unitImage(unit: DomNode): DomNode | undefined {
   return findAll(unit, (n) => n.tag === "img" && Boolean(n.src))
-    .filter((n) => n.box.width >= 80)
+    .filter((n) => n.box.width >= MEDIA_MIN_WIDTH)
     .sort((a, b) => b.box.width * b.box.height - a.box.width * a.box.height)[0];
 }
 
@@ -1302,9 +1313,16 @@ function buildHeader(
 
   const logoImg =
     findOne(header, (n) => /logo/.test(nameOf(n)) && n.tag === "img" && Boolean(n.src)) ??
-    findAll(header, (n) => n.tag === "img" && Boolean(n.src) && n.box.width >= 40 && n.box.height >= 16).sort(
-      (a, b) => b.box.width * b.box.height - a.box.width * a.box.height,
-    )[0];
+    // The fallback ("largest image in the header") is only a reasonable
+    // guess for something roughly logo-shaped. A wide decorative banner
+    // (emblem + title baked into one image, no separate small logo asset —
+    // a real observed shape) would otherwise "win" by sheer area and get
+    // squashed into a tiny logo slot by the fixed-height logo CSS. Reject
+    // anything wider than 4:1 and fall through to the text-brand fallback.
+    findAll(
+      header,
+      (n) => n.tag === "img" && Boolean(n.src) && n.box.width >= 40 && n.box.height >= 16 && n.box.width / n.box.height <= 4,
+    ).sort((a, b) => b.box.width * b.box.height - a.box.width * a.box.height)[0];
   const logoAsset = logoImg ? internImg(theme, logoImg) : null;
   const brand: Node = logoAsset
     ? {
@@ -1405,6 +1423,18 @@ function shortSiteName(name: string | undefined): string {
   return cut && cut.length <= 32 ? cut : name.slice(0, 28);
 }
 
+/** A dropdown/mega-menu toggle (`href="#"`, or a full URL with no real hash) —
+ * many distinct top-level nav items share this exact non-href, so it must
+ * never be treated as a dedup key the way a real, distinguishing href is. */
+function isPlaceholderHref(href: string): boolean {
+  if (href === "#") return true;
+  try {
+    return new URL(href).hash === "";
+  } catch {
+    return false;
+  }
+}
+
 function headerLinks(header: DomNode): Array<{ href: string; label: string }> {
   const seen = new Set<string>();
   const fromAnchors = findAll(
@@ -1420,9 +1450,10 @@ function headerLinks(header: DomNode): Array<{ href: string; label: string }> {
       if (!l.label || l.label.length > 28) return false;
       if (/^(cart|search|login|log in|account|wishlist|menu)$/i.test(l.label)) return false;
       const key = l.label.toLowerCase();
-      if (seen.has(key) || seen.has(l.href)) return false;
+      const placeholder = isPlaceholderHref(l.href);
+      if (seen.has(key) || (!placeholder && seen.has(l.href))) return false;
       seen.add(key);
-      seen.add(l.href);
+      if (!placeholder) seen.add(l.href);
       return true;
     });
   if (fromAnchors.length) return fromAnchors.slice(0, 8);
