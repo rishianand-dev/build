@@ -15,6 +15,7 @@ import { clearSessionCookie, readCookie, setSessionCookie } from "./cookies.js";
 import { migrate } from "./db.js";
 import { getJob, parseFigmaInput, parseHttpUrl, startFigmaJob, startJob, type Job } from "./jobs.js";
 import { applyReviewAction, type ReviewAction } from "./review.js";
+import { getPixelMatchRun, startPixelMatchRun } from "./pixel-match-jobs.js";
 
 const MIME: Record<string, string> = {
   ".png": "image/png",
@@ -185,6 +186,26 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
           : { path: nodePath, action };
       const theme = await applyReviewAction(themeNodeMatch[1]!, user.id, reviewAction);
       send(res, 200, theme);
+      return true;
+    }
+
+    const pixelMatchStartMatch = path.match(/^\/api\/captures\/([^/]+)\/pixel-match$/);
+    if (method === "POST" && pixelMatchStartMatch) {
+      const body = await readJson(req);
+      const maxIterations = typeof body.maxIterations === "number" ? body.maxIterations : undefined;
+      // Ownership check up front (cheap, no DOM) so an unowned/unknown
+      // capture id 404s immediately, not asynchronously via a later poll.
+      await readCapture(pixelMatchStartMatch[1]!, false, user.id);
+      const run = startPixelMatchRun(pixelMatchStartMatch[1]!, user.id, { maxIterations });
+      send(res, 202, run);
+      return true;
+    }
+
+    const pixelMatchRunMatch = path.match(/^\/api\/pixel-match\/([^/]+)$/);
+    if (method === "GET" && pixelMatchRunMatch) {
+      const run = getPixelMatchRun(pixelMatchRunMatch[1]!, user.id);
+      if (!run) throw new HttpError(404, "Run not found");
+      send(res, 200, run);
       return true;
     }
 

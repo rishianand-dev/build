@@ -1,0 +1,94 @@
+[
+  {
+    "id": "lp-mtu15r78-wzdb",
+    "role": "card",
+    "matchers": [
+      {
+        "kind": "class",
+        "pattern": "align-items-center"
+      },
+      {
+        "kind": "class",
+        "pattern": "d-flex"
+      },
+      {
+        "kind": "id",
+        "pattern": "hero"
+      }
+    ],
+    "confidence": 0.55,
+    "hits": 1,
+    "source": "pixel-loop+vision",
+    "learnedAt": "2026-09-09T11:43:51.284Z",
+    "examples": [
+      "div.d-flex — \"Real region looks like a card (Language selection card for the Indian Space Research Organisation website, offering Hindi and English options.); rendered as footer (A cropped section of a footer with links to ISRO portals and programs.).\""
+    ]
+  },
+  {
+    "id": "lp-mtu16erc-thfn",
+    "role": "carousel",
+    "matchers": [
+      {
+        "kind": "class",
+        "pattern": "print-updates"
+      },
+      {
+        "kind": "class",
+        "pattern": "chefs"
+      },
+      {
+        "kind": "id",
+        "pattern": "chefs"
+      }
+    ],
+    "confidence": 0.55,
+    "hits": 1,
+    "source": "pixel-loop+vision",
+    "learnedAt": "2026-09-09T11:44:21.816Z",
+    "examples": [
+      "div.chefs — \"Real region looks like a carousel (A carousel of images showing the launch of a rocket, from preparation to liftoff.); rendered as tile (A cropped section of a web page showing mission details for various space missions, including GSLV-F17/EOS-05, PSLV-C62/EOS-N1, LVM3-M6/BlueBird Block-2, and LVM3-M5/CMS-03.).\""
+    ]
+  },
+  {
+    "id": "lp-mtu16t3y-65hl",
+    "role": "banner",
+    "matchers": [
+      {
+        "kind": "class",
+        "pattern": "specials"
+      }
+    ],
+    "confidence": 0.55,
+    "hits": 1,
+    "source": "pixel-loop+vision",
+    "learnedAt": "2026-09-09T11:44:40.414Z",
+    "examples": [
+      "div.specials — \"Real region looks like a banner (A banner displaying news and highlights related to ISRO's activities, including a call for registration and a celebration of National Space Day.); the rendered region is blank.\""
+    ]
+  },
+  {
+    "id": "lp-mtu176d4-cwst",
+    "role": "footer",
+    "matchers": [
+      {
+        "kind": "class",
+        "pattern": "align-items-center"
+      },
+      {
+        "kind": "class",
+        "pattern": "d-flex"
+      },
+      {
+        "kind": "id",
+        "pattern": "header"
+      }
+    ],
+    "confidence": 0.55,
+    "hits": 1,
+    "source": "pixel-loop+vision",
+    "learnedAt": "2026-09-09T11:44:57.592Z",
+    "examples": [
+      "header.d-flex — \"Real region looks like a footer (A cropped section of a footer with navigation links and social media icons.); rendered as header (A cropped section of a header with navigation links and a logo for 'ISRO DOS Banner'.).\""
+    ]
+  }
+]

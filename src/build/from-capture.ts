@@ -4,6 +4,7 @@ import { emptyTheme, type BindMap, type Node, type ThemeDoc } from "../schema/th
 import { cssColorToHex, luminance, saturations } from "./color.js";
 import { attachConnectedPages, internalNavHref, slugify } from "./connected-pages.js";
 import { setVisionCandidates, type VisionCandidate } from "./from-vision.js";
+import { loadLearnedPatterns, matchLearnedPatterns, type LearnedPattern } from "./learned-patterns.js";
 
 function walk(node: DomNode, visit: (n: DomNode) => void): void {
   visit(node);
@@ -97,7 +98,8 @@ function contains(parent: DomNode, target: DomNode): boolean {
 }
 
 function nameOf(node: DomNode): string {
-  return `${node.id} ${node.className} ${node.tag} ${node.role ?? ""}`.toLowerCase();
+  const dataAttrs = node.dataAttrs ? Object.values(node.dataAttrs).join(" ") : "";
+  return `${node.id} ${node.className} ${node.tag} ${node.role ?? ""} ${dataAttrs}`.toLowerCase();
 }
 
 function cssUrls(bg: string | undefined): string[] {
@@ -355,6 +357,7 @@ export function themeFromCapture(capture: PageCapture): ThemeDoc {
     headerEl,
     footerEl,
     visionCandidates,
+    learnedPatterns: loadLearnedPatterns(),
   };
 
   const body: Node[] = [];
@@ -468,6 +471,11 @@ interface BuildCtx {
   headerEl?: DomNode;
   footerEl?: DomNode;
   visionCandidates: Array<{ node: Node; box?: Box; reason: string }>;
+  /** Identifier rules accumulated across runs (learned-patterns.ts) — real
+   * tag/class/id/text signals the pixel-match loop has confirmed correlate
+   * with a given role, so a page doesn't have to re-fail the same way it
+   * did before this rule existed. */
+  learnedPatterns: LearnedPattern[];
 }
 
 function findHeaderNode(root: DomNode, probeBox?: Box | null): DomNode | undefined {
@@ -830,7 +838,25 @@ function unwrapBodyRoot(node: DomNode): DomNode {
   return current;
 }
 
+/** Applies a learned-pattern role only when nothing more specific already
+ * claimed one — real, purpose-built classifications (hero/newsletter/nav/
+ * etc, whether from a regex heuristic above or a learned dispatch) always
+ * win; this only fills in the gap where a section built as plain content
+ * because nothing recognized it, but a learned rule now does. */
+function applyLearnedRoleOverride(node: DomNode, ctx: BuildCtx, result: Node[]): Node[] {
+  if (!result.length) return result;
+  const first = result[0]!;
+  if (first.role !== undefined) return result;
+  const match = matchLearnedPatterns(node, ctx.learnedPatterns);
+  if (match) first.role = match.role;
+  return result;
+}
+
 function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
+  return applyLearnedRoleOverride(node, ctx, buildBlockCore(node, ctx));
+}
+
+function buildBlockCore(node: DomNode, ctx: BuildCtx): Node[] {
   if (node === ctx.headerEl || node === ctx.footerEl) return [];
   if (isModalOverlay(node)) return [];
   if (node.box.height < 24 && node.tag !== "video") return [];
@@ -858,7 +884,8 @@ function buildBlock(node: DomNode, ctx: BuildCtx): Node[] {
     }
   }
 
-  if (isNewsletter(node)) return buildNewsletter(node, ctx);
+  const learnedMatch = matchLearnedPatterns(node, ctx.learnedPatterns);
+  if (isNewsletter(node) || learnedMatch?.role === "newsletter") return buildNewsletter(node, ctx);
 
   const tiles = extractTiles(node, ctx);
   if (tiles.length >= 2) {

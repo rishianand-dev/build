@@ -186,6 +186,38 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
     return r.width >= 40 && r.height >= 24;
   }
 
+  const DATA_ATTR_ALLOWLIST = [
+    "testid",
+    "test",
+    "cy",
+    "component",
+    "component-name",
+    "section",
+    "section-type",
+    "section-id",
+    "block",
+    "block-type",
+    "role",
+    "name",
+    "type",
+    "widget",
+    "widget-type",
+    "module",
+    "id",
+  ];
+
+  const readDataAttrs = (el: Element): Record<string, string> | undefined => {
+    let out: Record<string, string> | undefined;
+    for (const key of DATA_ATTR_ALLOWLIST) {
+      const value = el.getAttribute(`data-${key}`);
+      if (value) {
+        out ??= {};
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
   const collectDom = (maxNodes: number): DomNode | null => {
     let count = 0;
     const walk = (el: Element): DomNode | null => {
@@ -202,6 +234,7 @@ export const runInPage = (cmd: InPageCommand): InPageResult => {
         className: typeof el.className === "string" ? el.className : "",
         role: el.getAttribute("role"),
         ariaLabel: el.getAttribute("aria-label"),
+        dataAttrs: readDataAttrs(el),
         text: ownText(el),
         box,
         style: readStyle(el),

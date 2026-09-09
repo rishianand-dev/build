@@ -22,12 +22,23 @@ function assetUrl(url: string, base?: string): string {
   return `${base.replace(/\/?$/, "/")}${url.replace(/^\.\//, "")}`;
 }
 
+const EMBEDDED_TOKEN_REF = /\$([a-z]+)\.([A-Za-z0-9_-]+)/g;
+
 function tokenValue(tokens: Tokens, raw: string | undefined): string | undefined {
   if (!raw) return undefined;
-  if (!isTokenRef(raw)) return raw;
-  const parsed = parseTokenRef(raw);
-  if (!parsed) return raw;
-  return tokens[parsed.group]?.[parsed.key] ?? raw;
+  if (isTokenRef(raw)) {
+    const parsed = parseTokenRef(raw);
+    if (parsed) return tokens[parsed.group]?.[parsed.key] ?? raw;
+    return raw;
+  }
+  // Compound values (e.g. `"1px solid $color.fg"`) carry a token ref that
+  // doesn't start the string, so isTokenRef's whole-string check misses it —
+  // resolve any embedded refs in place instead of leaking "$color.fg" as
+  // literal, invalid CSS.
+  if (!raw.includes("$")) return raw;
+  return raw.replace(EMBEDDED_TOKEN_REF, (match, group: string, key: string) => {
+    return tokens[group as keyof Tokens]?.[key] ?? match;
+  });
 }
 
 function box(value: Style["pad"], tokens: Tokens): string | undefined {
@@ -124,7 +135,24 @@ function resolveBind(bind: BindMap, key: string | undefined): string {
   return v === null || v === undefined ? "" : String(v);
 }
 
-function renderNode(node: Node, theme: ThemeDoc, bind: BindMap = {}, assetBase?: string): string {
+/**
+ * Injects a `data-tp` (theme-path) attribute into an already-rendered
+ * node's opening tag. Only called when a caller opted in (`path` set) —
+ * every existing call site passes no path, so default rendering is
+ * byte-for-byte unchanged. Lets a caller (the pixel-match loop) later ask
+ * a real browser "what's the bounding box of the node at this JSON
+ * pointer?" without duplicating any rendering logic.
+ */
+function withPath(html: string, path?: string): string {
+  if (!path || !html) return html;
+  return html.replace(/^<([a-zA-Z0-9]+)/, `<$1 data-tp="${path}"`);
+}
+
+function renderNode(node: Node, theme: ThemeDoc, bind: BindMap = {}, assetBase?: string, path?: string): string {
+  return withPath(renderNodeInner(node, theme, bind, assetBase, path), path);
+}
+
+function renderNodeInner(node: Node, theme: ThemeDoc, bind: BindMap = {}, assetBase?: string, path?: string): string {
   switch (node.type) {
     case "text": {
       const text = node.bind ? resolveBind(bind, node.bind) : (node.text ?? "");
@@ -194,7 +222,9 @@ function renderNode(node: Node, theme: ThemeDoc, bind: BindMap = {}, assetBase?:
         const slides = node.children.map((c) => renderNode(c, theme, bind, assetBase)).filter(Boolean);
         return carouselHtml(slides, per, classNames(node), slideVars(st));
       }
-      const inner = node.children.map((c) => renderNode(c, theme, bind, assetBase)).join("");
+      const inner = node.children
+        .map((c, i) => renderNode(c, theme, bind, assetBase, path ? `${path}/children/${i}` : undefined))
+        .join("");
       const tag = nodeTag(node);
       return `<${tag} class="${classNames(node)}">${inner}</${tag}>`;
     }
@@ -378,7 +408,7 @@ function carouselScript(): string {
 export function renderThemeHtml(
   theme: ThemeDoc,
   pageId = "home",
-  opts?: { assetBase?: string; pages?: "all" | "one" },
+  opts?: { assetBase?: string; pages?: "all" | "one"; tagPaths?: boolean },
 ): string {
   const selected = theme.pages.find((p) => p.id === pageId) ?? theme.pages[0];
   if (!selected) return "<!doctype html><title>Empty</title>";
@@ -395,7 +425,9 @@ export function renderThemeHtml(
     .join("\n");
   const body = pages
     .map((page) => {
-      const inner = renderNode(page.root, theme, {}, opts?.assetBase);
+      const pageIndex = theme.pages.indexOf(page);
+      const rootPath = opts?.tagPaths ? `/pages/${pageIndex}/root` : undefined;
+      const inner = renderNode(page.root, theme, {}, opts?.assetBase, rootPath);
       return `<article class="route" data-route="${esc(page.path)}" data-title="${esc(page.title || page.name || theme.site.name || "Site")}">${inner}</article>`;
     })
     .join("\n");

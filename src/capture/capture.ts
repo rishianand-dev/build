@@ -135,6 +135,25 @@ export async function capturePage(options: CaptureOptions): Promise<PageCapture>
 
     await waitSettled(page);
 
+    // A site can redirect the requested URL to an unrelated page — a
+    // signup/login gate, a country picker, a consent interstitial — before
+    // settling. Everything downstream captures and builds *that* page, so a
+    // silent redirect produces a "correct" clone of the wrong page (e.g. a
+    // thin header+footer with none of the requested page's real sections).
+    // Compare on pathname, not the full URL, so query strings, trailing
+    // slashes, and hash fragments don't trigger false positives.
+    try {
+      const requestedPath = new URL(options.url).pathname.replace(/\/$/, "") || "/";
+      const landedPath = new URL(page.url()).pathname.replace(/\/$/, "") || "/";
+      if (requestedPath !== landedPath) {
+        warnings.push(
+          `Redirected from ${requestedPath} to ${landedPath} — captured page may not be the one requested`,
+        );
+      }
+    } catch {
+      // Non-http(s) or otherwise unparseable URLs: skip the check rather than fail the capture.
+    }
+
     const dismissed = (await page.evaluate(runInPage, { op: "dismiss" as const })).dismissed;
     if (dismissed.length) {
       warnings.push(`Dismissed overlays: ${dismissed.join(", ")}`);

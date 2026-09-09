@@ -105,6 +105,15 @@ describe("theme intern", () => {
     expect(Object.keys(theme.tokens.color)).toEqual(["fg"]);
   });
 
+  it("still creates a distinct hinted token even when its value matches an existing different key (e.g. card === bg on a monochrome site)", () => {
+    const theme = emptyTheme();
+    internToken(theme.tokens, "color", "#ffffff", "bg");
+    const ref = internToken(theme.tokens, "color", "#ffffff", "card");
+    expect(ref).toBe("$color.card");
+    expect(theme.tokens.color.card).toBe("#ffffff");
+    expect(theme.tokens.color.bg).toBe("#ffffff");
+  });
+
   it("reuses the same style id for an identical style object", () => {
     const styles = {};
     const a = internStyle(styles, { pad: "$space.3", bg: "$color.bg" });

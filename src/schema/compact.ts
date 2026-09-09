@@ -106,16 +106,26 @@ export function internToken(
   hint?: string,
 ): string {
   const bag = tokens[group];
+  // A caller naming a hint wants that exact semantic slot (e.g. "card",
+  // "heading") to exist under that key — even when its value happens to
+  // match an already-interned, differently-named token (e.g. "card" ===
+  // "bg" on a monochrome site). Callers elsewhere hardcode "$group.hint"
+  // string literals expecting the key to be there; silently aliasing it
+  // to a different key left those literals dangling and unresolved.
+  if (hint !== undefined) {
+    if (bag[hint] === value) return `$${group}.${hint}`;
+    if (bag[hint] === undefined) {
+      bag[hint] = value;
+      return `$${group}.${hint}`;
+    }
+    // hint already holds a different value — fall through to reuse-by-value/auto-generate.
+  }
   for (const [key, existing] of Object.entries(bag)) {
     if (existing === value) return `$${group}.${key}`;
   }
-  let key = hint && !bag[hint] ? hint : "";
-  if (!key) {
-    let i = Object.keys(bag).length + 1;
-    do {
-      key = `${group[0]}${i++}`;
-    } while (bag[key]);
-  }
+  let i = Object.keys(bag).length + 1;
+  let key = `${group[0]}${i++}`;
+  while (bag[key]) key = `${group[0]}${i++}`;
   bag[key] = value;
   return `$${group}.${key}`;
 }

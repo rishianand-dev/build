@@ -101,6 +101,39 @@ export interface ThemeView {
   review: ReviewItem[];
 }
 
+export interface Band {
+  yStart: number;
+  yEnd: number;
+  diffRatio: number;
+}
+
+export interface KeywordEvidence {
+  label: string;
+  matchedText: string;
+}
+
+export interface IterationRecord {
+  iteration: number;
+  diffRatio: number;
+  band: Band | null;
+  patchedPath: string | null;
+  keywordEvidence: KeywordEvidence[];
+  screenshotPath: string;
+  diffPngPath: string;
+  note?: string;
+}
+
+export interface PixelMatchRun {
+  id: string;
+  captureId: string;
+  status: "queued" | "running" | "done" | "error";
+  history: IterationRecord[];
+  converged?: boolean;
+  error?: string;
+  started_at: string;
+  finished_at?: string;
+}
+
 export type ReviewActionBody =
   | { path: string; action: "accept" }
   | { path: string; action: "reject" }
@@ -170,4 +203,14 @@ export const api = {
       }),
     ),
   job: (id: string) => json<Job>(fetch(`/api/jobs/${id}`, credentials)),
+  startPixelMatch: (captureId: string, maxIterations?: number) =>
+    json<PixelMatchRun>(
+      fetch(`/api/captures/${captureId}/pixel-match`, {
+        ...credentials,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(maxIterations ? { maxIterations } : {}),
+      }),
+    ),
+  pixelMatchRun: (runId: string) => json<PixelMatchRun>(fetch(`/api/pixel-match/${runId}`, credentials)),
 };

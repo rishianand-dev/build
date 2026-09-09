@@ -656,3 +656,181 @@ button.text {
     justify-content: space-between;
   }
 }
+
+/* Pixel-Match Loop — a separate page, deliberately not sharing layout with
+ * .app/.workspace above so it can't visually or structurally regress Studio. */
+.pm-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pm-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--white) 70%, transparent);
+}
+
+.pm-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.pm-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pm-controls select,
+.pm-controls input[type="number"] {
+  border: 1px solid var(--ink);
+  background: var(--white);
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+}
+
+.pm-controls button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  background: var(--accent);
+  color: var(--white);
+  cursor: pointer;
+}
+
+.pm-controls button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pm-status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.pm-status-done {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.pm-status-error {
+  border-color: var(--no);
+  color: var(--no);
+}
+
+.pm-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  min-height: 0;
+}
+
+.pm-chart-col {
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.pm-chart {
+  width: 100%;
+  height: 120px;
+  margin-bottom: 12px;
+}
+
+.pm-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pm-history button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ink);
+}
+
+.pm-history button.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--white));
+}
+
+.pm-history code {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.pm-history em {
+  font-size: 11px;
+  font-style: normal;
+  color: var(--accent-2);
+}
+
+.pm-history small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.pm-images {
+  padding: 20px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pm-images figure {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.pm-images figcaption {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+
+.pm-images img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  .pm-body {
+    grid-template-columns: 1fr;
+  }
+  .pm-chart-col {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}

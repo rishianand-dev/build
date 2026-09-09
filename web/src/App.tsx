@@ -10,6 +10,7 @@ import {
   type ThemeView,
 } from "./api";
 import { ReviewPanel } from "./Review";
+import { PixelMatchPage } from "./PixelMatch";
 
 const STEPS = [
   "queued",
@@ -67,8 +68,19 @@ function Flag({ on, label }: { on: boolean; label: string }) {
   );
 }
 
+function useHashRoute(): string {
+  const [hash, setHash] = useState(() => window.location.hash);
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  }, []);
+  return hash;
+}
+
 export function App() {
   const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
+  const hash = useHashRoute();
 
   useEffect(() => {
     void api
@@ -79,18 +91,23 @@ export function App() {
 
   if (user === undefined) return <AuthBoot />;
   if (!user) return <AuthScreen onAuthed={setUser} />;
-  return (
-    <Studio
-      user={user}
-      onLogout={async () => {
-        try {
-          await api.logout();
-        } finally {
-          setUser(null);
-        }
-      }}
-    />
-  );
+
+  const onLogout = async () => {
+    try {
+      await api.logout();
+    } finally {
+      setUser(null);
+    }
+  };
+
+  // A genuinely separate page (own component tree, own route) rather than
+  // another tab bolted onto Studio's view-switcher — reachable only via its
+  // own link, so it can't affect Studio's normal view at all.
+  if (hash.startsWith("#pixel-match")) {
+    return <PixelMatchPage user={user} onBack={() => (window.location.hash = "")} />;
+  }
+
+  return <Studio user={user} onLogout={onLogout} />;
 }
 
 function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<void> }) {
@@ -271,6 +288,9 @@ function Studio({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<vo
           </button>
         </form>
         <div className="account">
+          <a className="text" href="#pixel-match">
+            Pixel-Match Loop →
+          </a>
           <span>{user.name || user.email}</span>
           <button type="button" className="text" onClick={() => void onLogout()}>
             Sign out

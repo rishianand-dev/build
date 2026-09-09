@@ -42,6 +42,12 @@ export interface DomNode {
   className: string;
   role: string | null;
   ariaLabel: string | null;
+  /**
+   * Semantic data-* attributes (data-testid, data-component, data-section-type,
+   * etc.) — an allowlist, not every data-* on the element, since frameworks
+   * dump non-semantic noise there too (Vue's data-v-hash, React devtools ids).
+   */
+  dataAttrs?: Record<string, string>;
   href?: string;
   src?: string;
   srcset?: string;

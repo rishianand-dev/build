@@ -22,6 +22,16 @@ export function getPool(): pg.Pool {
       max: 5,
       connectionTimeoutMillis: 15_000,
     });
+    // pg emits 'error' on the pool when an *idle* client's connection is
+    // dropped by the server (Neon/serverless Postgres closes idle
+    // connections after inactivity — routine, not a bug on our side). With
+    // no listener, Node treats that as an uncaught exception and kills the
+    // whole process — which took down the entire dev server (API included)
+    // overnight. The pool discards the dead client and reconnects on the
+    // next query on its own; there's nothing to do here but not crash.
+    pool.on("error", (err) => {
+      console.error("[honebi] pg pool idle client error (connection recovered automatically):", err.message);
+    });
   }
   return pool;
 }
